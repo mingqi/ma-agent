@@ -1,0 +1,14 @@
+{
+	"folders":
+	[
+		{
+			"path": "/Users/mingqi/monitorat/ma-agent"
+		},
+		{
+			"path": "/Users/mingqi/github/fluentd"
+		},
+		{
+			"path": "/Users/mingqi/ruby/spy-fluent"
+		}
+	]
+}
