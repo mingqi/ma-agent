@@ -1,10 +1,11 @@
 module MonitorAt
   class MonitorAtTSDOutput < Fluent::BufferedOutput
-    Fluent::Plugin.register_output('monat_tsd', self)
+    Fluent::Plugin.register_output('monat_upload', self)
 
     config_param :remote_host, :string, :default => 'localhost'
     config_param :remote_port, :integer, :default => 9998
-    config_param :tsd_key, :string, :default => 'tsds'
+    config_param :key, :string
+    config_param :uri, :string
 
     def initialize
       super
@@ -16,15 +17,16 @@ module MonitorAt
 
     def configure(conf)
       super
+      if !@key 
+        raise Fluent::ConfigError, "key is necessary on monat_upload"
+      end
     end
 
     def format(tag, time, record)
-      puts "record is #{record}"
       result = ''
       timestamp = Time.at(time).strftime('%Y-%m-%dT%H:%M:%S%:z')
-      tsds = record[@tsd_key]
+      tsds = record[@key]
       tsds = [tsds] if (not tsds.is_a? Array)
-      puts "tsds is #{tsds}"
       tsds.reduce('') do | result, tsd |
         tsd['timestamp'] ||= timestamp 
         result << Yajl.dump(tsd) << "\n"
@@ -61,9 +63,9 @@ module MonitorAt
 
     def _upload(payload)
       begin
-        res = RestClient.post("http://#{@remote_host}:#{@remote_port}/tsds", _gzip(payload), 'Content-Type' => 'application/json', 'Content-Encoding' => 'gzip' )
+        res = RestClient.post("http://#{@remote_host}:#{@remote_port}#{@uri}", _gzip(payload), 'Content-Type' => 'application/json', 'Content-Encoding' => 'gzip' )
       rescue  RestClient::BadRequest
-        $log.warn "Bad data was send to Spy Gateway, discard them!!"
+        $log.warn "Bad data was send to monitorat service, discard them!!"
       end         
     end
 

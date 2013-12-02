@@ -32,7 +32,8 @@ module MonitorAt
           'category' => 'server',
           'instance' => hostname,
           'metadata' => {
-            'disks' => disks_meta
+            'disks' => disks_meta,
+            'net-if' => Sysstat.ifs
           }
         }
       }

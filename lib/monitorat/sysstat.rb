@@ -83,4 +83,47 @@ class Sysstat
     result
   end
 
+  def self.ifs
+    result = []
+    File.open('/proc/net/dev', 'r').each do | line |
+      sp = line.split(':')
+      next if sp.count < 2
+      result << sp[0].strip if not sp[0].strip =~ /^(lo|bond\d+|face|.+\.\d+)$/
+    end
+    return result
+  end
+
+  def self.if_stat(if_name)
+    col_map = {
+      'read_bytes' => 0,
+      'read_packets' => 1,
+      'read_errs' => 2,
+      'read_drop' => 3,
+      'read_fifo' => 4,
+      'read_frame' => 5,
+      'read_compressed'  => 6,
+      'read_multicast' => 7,
+      'write_bytes' => 8,
+      'write_packets' => 9,
+      'write_errs' => 10,
+      'write_drop' => 11,
+      'write_fifo' => 12,
+      'write_frame' => 13,
+      'write_compressed'  => 14,
+      'write_multicast' => 15,
+    }
+
+    result = {}
+    File.open('/proc/net/dev', "r").each do | line |
+      sp = line.split(':')
+      next if sp.count < 2
+      if sp[0].strip == if_name
+        sp2 = sp[1].split
+        col_map.each {|field, column| result[field] = sp2[column].to_i }
+        break
+      end
+    end
+
+    return result
+  end
 end
