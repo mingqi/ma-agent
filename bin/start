@@ -1,0 +1,7 @@
+#!/bin/bash
+
+BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+fluentd -c $BASE_DIR/etc/fluentd.conf \
+        -p $BASE_DIR/lib/monitorat/plugin/ \
+        -I $BASE_DIR/lib/ 
+

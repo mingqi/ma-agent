@@ -1,4 +1,5 @@
 require 'pathname'
+require 'sys/filesystem'
 
 class Sysstat
 
@@ -30,6 +31,44 @@ class Sysstat
         break
       end
     end
+    return result
+  end
+
+  def self.meminfo()
+    result = {}
+    field_mapping = {
+      'MemTotal' => 'total',
+      'MemFree' => 'free',
+      'Buffers' => 'buffers',
+      'Cached' => 'cached',
+    }
+    File.open("/proc/meminfo", "r").each do | line | 
+        sp = line.split
+        size = sp[1].to_i 
+        name = sp[0].split(':')[0]
+        if field_mapping.has_key? name
+          result[field_mapping[name]] = size
+        end
+    end
+    result['used'] = result['total'] - result['free'] - result['buffers'] - result['cached']
+    return result
+  end
+
+  def self.swap()
+    result = {}
+    field_mapping = {
+      'SwapTotal' => 'total',
+      'SwapFree' => 'free'
+    }
+    File.open("/proc/meminfo", "r").each do | line | 
+        sp = line.split
+        size = sp[1].to_i 
+        name = sp[0].split(':')[0]
+        if field_mapping.has_key? name
+          result[field_mapping[name]] = size
+        end
+    end
+    result['used'] = result['total'] - result['free']
     return result
   end
 
@@ -66,9 +105,12 @@ class Sysstat
         'read_times' => 3,
         'read_merged_times' => 4,
         'read_sectors' => 5,
+        'time_on_read' => 6,
         'write_times' => 7,
         'write_merged_times' => 8,
         'write_sectors' => 9,
+        'time_on_write' => 10,
+        'time_on_io' => 12
       } 
 
       if sp[2] == dev_name
@@ -81,6 +123,15 @@ class Sysstat
       end
     end
     result
+  end
+
+  def self.disk_space(disk)
+    stat = Sys::Filesystem.stat(disk)
+    return {
+      'total' => stat.blocks * stat.block_size,
+      'free' => stat.blocks_available * stat.block_size,
+      'used' => (stat.blocks - stat.blocks_available) * stat.block_size
+    }
   end
 
   def self.ifs

@@ -1,0 +1,51 @@
+#!/bin/bash
+
+BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+
+echo $BASE_DIR
+
+pidfile=$BASE_DIR/var/ma-agent.pid
+start(){
+    echo "Starring ma-agent..."
+    if [ -f $pidfile ]; then
+        pid=`cat $pidfile`
+        if kill -0 $pid > /dev/null 2>&1; then
+            echo "process already running on $pid"
+            exit 1
+        fi  
+    fi
+    fluentd -c $BASE_DIR/fluentd.conf -p $BASE_DIR/lib/monitorat/plugin/ -I $BASE_DIR/lib/ -d $pidfile -o $BASE_DIR/var/ma-agent.log
+}
+
+
+stop(){
+    echo "Stopping ma-agent..."
+    if [ -f $pidfile ] ; then
+        pid=`cat $pidfile`
+        if kill $pid > /dev/null 2>&1; then
+            rm -rf $pidfile
+        fi  
+    fi 
+}
+
+restart() {
+    stop
+    start
+}
+
+case "$1" in
+    start)
+    start
+    ;;
+    stop)
+    stop
+    ;;
+    restart)
+    restart
+    ;;
+    *)
+    echo "Usage: $prog {start|stop|restart}"
+    exit 1
+    ;;
+esac
+exit $?

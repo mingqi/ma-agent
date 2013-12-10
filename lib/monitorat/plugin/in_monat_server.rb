@@ -25,20 +25,65 @@ module MonitorAt
     def run
       time = Fluent::Engine.now
       hostname = Socket.gethostname
-      cpu_delta_time = delta_values(Sysstat.cpu_time)
-      if not cpu_delta_time['total']
-        return
-      end
-      cpu_delta_time.each {|k,v| cpu_delta_time[k] = v.to_f}
-      metric_values = {}
-      metric_values["server/#{hostname}/cpu/user_usage"] = cpu_delta_time['user'] / cpu_delta_time['total'] if cpu_delta_time['user']
-      metric_values["server/#{hostname}/cpu/system_usage"] = cpu_delta_time['system'] / cpu_delta_time['total'] if cpu_delta_time['system']
-      metric_values["server/#{hostname}/cpu/iowait_usage"] = cpu_delta_time['iowait'] / cpu_delta_time['total'] if cpu_delta_time['iowait']
+      metrics = {}
 
-      tsds = metric_values.map do |m_name, m_value|
-        { 'metric-name' => m_name,
-          'value' => (100 * m_value).round(2)
-        }
+      uptime = delta_values({'uptime' => Sysstat.uptime})
+      elapsed = uptime['uptime'] || 0
+
+      cpu_time = {}
+      Sysstat.cpu_time.each do |k, v| 
+        cpu_time["server/#{hostname}/cpu/#{k}"] = v
+      end 
+      cpu_time = delta_values(cpu_time)
+      if total = cpu_time["server/#{hostname}/cpu/total"]
+        cpu_time.select{|k,_| not k.end_with?('/total')}.each do |k,v|
+          metrics[k] = (100 * v / total).round(2)
+        end 
+      end
+
+      Sysstat.meminfo.each do |k, v|
+        metrics["server/#{hostname}/memory/#{k}"] = v
+      end
+
+      Sysstat.swap.each do |k, v|
+        metrics["server/#{hostname}/swap/#{k}"] = v
+      end
+
+      Sysstat.ifs.each do |if_name|
+        if_stat = {}
+        Sysstat.if_stat(if_name).each { |k,v| if_stat["server/#{hostname}/if/#{if_name}/#{k}"] = v }
+        delta_values(if_stat).each do |k, v|
+          metrics[k] = v
+          if elapsed > 0
+            metrics["#{k}_rate"] = ((v * 1000) / elapsed).round(2)
+          end
+        end 
+      end
+
+      Sysstat.disks.each do |disk_name, mount_point|
+        disk_stat = {}
+        Sysstat.disk_stat(disk_name).each {|k,v| disk_stat["server/#{hostname}/disk/#{disk_name}/#{k}"] = v}
+        delta_values(disk_stat).each do |k, v|
+          metrics[k] = v
+          if elapsed > 0
+            if ['read_times', 'read_merged_times', 'read_bytes', 
+                'write_times', 'write_merged_times', 'write_bytes'].any? {|e| k.end_with?(e) }
+              metrics["#{k}_rate"] = ((v * 1000) / elapsed).round(2)
+            end
+
+            if k.end_with? 'time_on_io'
+              metrics["server/#{hostname}/disk/#{disk_name}/util"] = (100 * v / elapsed).round
+            end
+          end
+        end
+
+        Sysstat.disk_space(mount_point).each do | k, v |
+          metrics["server/#{hostname}/disk_space/#{disk_name}/#{k}"] = v
+        end
+      end
+
+      tsds = metrics.inject([]) do |r, (k,v)|
+        r << {'metric-name' => k, 'value' => v}
       end
 
       Fluent::Engine.emit(@tag, time, {'tsds' => tsds}) if not tsds.empty?
