@@ -1,0 +1,7 @@
+{
+  "ruby" : "1.9.3",
+  "sys-filesystem" : ["*", "gem"],
+  "rest-client" : ["*", "gem"],
+  "fluentd" : ["*", "gem"],
+  "ma-agent" : "1.0"
+}

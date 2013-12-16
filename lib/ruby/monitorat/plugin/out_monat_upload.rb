@@ -34,7 +34,7 @@ module MonitorAt
     end
 
     def write(chunk)
-      puts "write chunk..."
+      $log.info "wwrite chunk..."
       i = 0
       payload = ''
       StringIO.new(chunk.read).each do |line|
@@ -62,6 +62,7 @@ module MonitorAt
     private
 
     def _upload(payload)
+      $log.info "upload TSD data: #{payload}"
       begin
         res = RestClient.post("http://#{@remote_host}:#{@remote_port}#{@uri}", _gzip(payload), 'Content-Type' => 'application/json', 'Content-Encoding' => 'gzip' )
       rescue  RestClient::BadRequest

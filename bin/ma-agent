@@ -14,7 +14,7 @@ start(){
             exit 1
         fi  
     fi
-    fluentd -c $BASE_DIR/fluentd.conf -p $BASE_DIR/lib/monitorat/plugin/ -I $BASE_DIR/lib/ -d $pidfile -o $BASE_DIR/var/ma-agent.log
+    $BASE_DIR/ruby/bin/fluentd -c $BASE_DIR/etc/fluentd.conf -p $BASE_DIR/lib/ruby/monitorat/plugin/ -I $BASE_DIR/lib/ruby -d $pidfile -o $BASE_DIR/var/ma-agent.log
 }
 
 
