@@ -3,5 +3,6 @@
   "sys-filesystem" : ["*", "gem"],
   "rest-client" : ["*", "gem"],
   "fluentd" : ["*", "gem"],
+  "daemons" : ["*", "gem"],
   "ma-agent" : "1.0"
 }
