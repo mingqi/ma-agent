@@ -1,22 +1,8 @@
-#!/usr/local/mygod/bin/mygod-env ruby
-require 'daemons'
+#!/usr/bin/env ruby
+
 require 'pathname'
-
-options = {
-  :log_output => true,
-  :dir_mode => :normal,
-  :dir => './var'
-}
-
-
 base_dir = Pathname(__FILE__).expand_path.dirname.dirname
-fluentd_path = base_dir.join('ruby/bin/fluentd')
-config_path = base_dir.join('etc/fluentd.conf')
-plugin_path = base_dir.join('lib/ruby/monitorat/plugin')
-lib_path = base_dir.join('lib/ruby')
-output_path = base_dir.join('var/ma-agent.log')
-run_cmd = "#{fluentd_path.to_path} -c #{config_path.to_path} -p #{plugin_path.to_path} -I #{lib_path.to_path} -o #{output_path.to_path}"
+$LOAD_PATH << base_dir.join('lib').to_path
+ENV["FLUENT_CONF"] = base_dir.join('etc', 'fluentd.conf').to_path
 
-Daemons.run_proc('ma-agent', options) do
-  exec(run_cmd)
-end
+require 'fluent/command/fluentd'

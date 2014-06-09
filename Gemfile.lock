@@ -1,0 +1,25 @@
+PATH
+  remote: .
+  specs:
+    ma-agent (0.1)
+      daemons
+      rest-client
+      ruby-mysql
+
+GEM
+  remote: https://ruby.taobao.org/
+  specs:
+    daemons (1.1.9)
+    mime-types (2.3)
+    rake (10.3.2)
+    rest-client (1.6.7)
+      mime-types (>= 1.16)
+    ruby-mysql (2.9.12)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  bundler (~> 1.6)
+  ma-agent!
+  rake

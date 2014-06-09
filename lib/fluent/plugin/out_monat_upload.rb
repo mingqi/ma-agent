@@ -1,11 +1,11 @@
-module MonitorAt
-  class MonitorAtTSDOutput < Fluent::BufferedOutput
+module Fluent
+  class MonitorAtUploadOutput < Fluent::BufferedOutput
     Fluent::Plugin.register_output('monat_upload', self)
 
     config_param :remote_host, :string, :default => 'localhost'
     config_param :remote_port, :integer, :default => 9998
-    config_param :key, :string
-    config_param :uri, :string
+    config_param :key, :string, :default => 'tsds'
+    config_param :uri, :string, :default => '/tsd'
 
     def initialize
       super
@@ -34,7 +34,7 @@ module MonitorAt
     end
 
     def write(chunk)
-      $log.info "wwrite chunk..."
+      $log.info "write chunk..."
       i = 0
       payload = ''
       StringIO.new(chunk.read).each do |line|
