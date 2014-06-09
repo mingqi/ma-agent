@@ -21,5 +21,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "ruby-mysql"
   spec.add_dependency "rest-client"
   spec.add_dependency "daemons"
-  spec.add_dependency "fluent"
+  spec.add_dependency "fluentd", "~>0.10.0"
 end
