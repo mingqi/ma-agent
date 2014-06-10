@@ -1,7 +1,7 @@
 module MonitorAt
 
   class PeriodicInput < Fluent::Input
-    config_param :interval, :integer, :default => 1
+    config_param :interval, :time, :default => 1
 
     def start
       @stop_flag = false      
