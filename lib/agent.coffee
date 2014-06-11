@@ -11,6 +11,7 @@ engine.add_input(sql({
   user: 'ma_readonly'
   password: 'ma_readonlyonly'
   database: 'tsclogdb'
+  interval: 10
   query: 'select count(*) from detail_weblogs where add_date > now() - interval 5 minute'
   }))
 # engine.reg_input(tail)
@@ -22,4 +23,12 @@ engine.add_output('tsd', upload({
   uri : '/tsd'}))
 # engine.add_output('tsd', stdout())
 
-engine.start()
+d = require('domain').create();
+d.on('error', (er) ->
+    console.error('error, but oh well', er.message);
+    console.error er.stack
+)
+
+d.run(() ->
+  engine.start() 
+)

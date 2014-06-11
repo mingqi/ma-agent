@@ -14,10 +14,9 @@ module.exports = (config) ->
         path: config.uri
         headers : {
           'Content-Type' : 'application/json'
-          # 'Content-Encoding' : 'gzip'
+          'Content-Encoding' : 'gzip'
         }
       }
-
 
       req = http.request(options, (res) ->
         res.setEncoding('utf8');
@@ -25,15 +24,18 @@ module.exports = (config) ->
           console.log "post status is " + res.statusCode
         ) 
       )
-      req.write(body);
-      req.end()
-      ###
+
+      req.on('error1', (e) ->
+        console.log e
+        console.log( e instanceof Error)
+      
+      )
+
       zlib.gzip(body, (err, result) ->
-        console.log "post data"
         req.write(result);
         req.end()
       ) 
-      ###
+      
           
     shutdown : () ->
       console.log "upload shutdown..."          

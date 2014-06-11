@@ -20,7 +20,7 @@ module.exports = (config) ->
 
   return {
     start : (emit) ->
-      setInterval(query, 1000, emit)
+      setInterval(query, config.interval * 1000, emit)
     
     shutdown : () ->
       console.log "shutdonw..."

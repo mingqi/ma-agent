@@ -9,7 +9,9 @@ Engine = () ->
   emit = (tag, record, time) ->
     for [match, output] in outputs
       if match == tag
-        setImmediate(output.receive, tag, record, time || Date() )     
+        setImmediate(() ->
+          output.receive(tag, record, time || Date() )            
+        )     
   
   return {
     add_input : (input) ->
