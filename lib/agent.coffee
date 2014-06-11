@@ -12,6 +12,7 @@ engine.add_input(sql({
   password: 'ma_readonlyonly'
   database: 'tsclogdb'
   interval: 10
+  metric: 'detail_weblogs'
   query: 'select count(*) from detail_weblogs where add_date > now() - interval 5 minute'
   }))
 # engine.reg_input(tail)

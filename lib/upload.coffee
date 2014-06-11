@@ -28,10 +28,10 @@ module.exports = (config) ->
       req.on('error1', (e) ->
         console.log e
         console.log( e instanceof Error)
-      
       )
 
       zlib.gzip(body, (err, result) ->
+        console.log "post data #{body}"
         req.write(result);
         req.end()
       ) 

@@ -15,7 +15,7 @@ module.exports = (config) ->
       if rows? and rows.length > 0
         value = rows[0][fields[0].name]
         conn.destroy()
-        emit("tsd", {metric: 'order_number', value: value})
+        emit("tsd", {metric: config.metric, value: value})
     )
 
   return {
