@@ -1,0 +1,12 @@
+{
+  "name": "ma-agent",
+  "description": "agent of Monitor@",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "underscore" : "*",
+    "moment" : "*",
+    "async" : "*",
+    "mysql" : "*"
+  }
+}

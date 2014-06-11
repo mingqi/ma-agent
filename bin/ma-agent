@@ -1,8 +1,0 @@
-#!/usr/bin/env ruby
-
-require 'pathname'
-base_dir = Pathname(__FILE__).expand_path.dirname.dirname
-$LOAD_PATH << base_dir.join('lib').to_path
-ENV["FLUENT_CONF"] = base_dir.join('etc', 'fluentd.conf').to_path
-
-require 'fluent/command/fluentd'
