@@ -7,6 +7,8 @@
     "underscore" : "*",
     "moment" : "*",
     "async" : "*",
-    "mysql" : "*"
+    "mysql" : "*",
+    "tail" : "*",
+    "xregexp" : "*"
   }
 }
