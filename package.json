@@ -9,6 +9,7 @@
     "async" : "*",
     "mysql" : "*",
     "tail" : "*",
-    "xregexp" : "*"
+    "xregexp" : "*",
+    "utile" : "*"
   }
 }

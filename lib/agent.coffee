@@ -29,6 +29,7 @@ engine.add_input(tail({
   path : '/var/tmp/test.log'
   pattern : '[^|]+\\|[^|]+\\|(?<value>[^|]+)\\|[^|]+\\|[^|]+\\|[^|]+detail\\.html'
   }))
+
 engine.add_output('tsd', upload({
   host : 'localhost'
   port : 9090 
