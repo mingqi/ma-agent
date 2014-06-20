@@ -6,7 +6,10 @@ buffer = require '../buffer'
 Upload = (config) ->
 
   return {
+    name : 'upload'
+    
     start : (cb) ->
+      console.log "upload started"
       cb()    
 
     shutdown : (cb) ->

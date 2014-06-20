@@ -13,12 +13,14 @@ module.exports = (config, output) ->
 
   collectBuffer = () ->
     if buffer.length > 0
-      chunkReceiver(buffer)
+      output.writeChunk(buffer)
       buffer = []
 
   intervalObj = null 
 
   return {
+
+    name : output.name
 
     start : (cb) ->
       output.start((err) ->
@@ -28,6 +30,7 @@ module.exports = (config, output) ->
       )
 
     write : (tag, record, time) ->
+      console.log "buffer write: #{record}"
       buffer.push([tag, record, time])
       if buffer.length >= config.buffer_size
         collectBuffer() 

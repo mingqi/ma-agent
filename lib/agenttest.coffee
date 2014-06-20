@@ -1,7 +1,6 @@
 Engine = require './engine'
 sql = require './plugin/in_sql'
 in_test = require './plugin/in_test'
-# tail = require './tail'
 upload = require './plugin/out_upload'
 stdout = require './plugin/out_stdout'
 
@@ -38,19 +37,5 @@ engine.addInput(sql({
 
 engine.addOutput('tsd', stdout())
 
-# engine.add_output('tsd', buffer_test({
-#   buffer_size : 1000
-#   flush_interval : 3
-#   }))
-
-d = require('domain').create();
-d.on('error', (er) ->
-    console.error('error, but oh well', er.message);
-    console.error er.stack
-)
-
-d.run(() ->
-  engine.start((err) ->
-    console.log err    
-  ) 
-)
+engine.start((err) ->
+  console.log err    

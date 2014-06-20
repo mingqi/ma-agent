@@ -2,6 +2,7 @@ events = require('events');
 utile = require 'utile'
 async = require 'async'
 us = require 'underscore'
+util = require 'util'
 
 empty_cb = `function (err){}`
 
@@ -61,8 +62,10 @@ Engine = () ->
   emit = (tag, record, time) ->
     for [match, output] in outputs
       if match == tag
-        setImmediate(() ->
-          output.write(tag, record, time || Date() )            
+        setImmediate(
+          (o) ->
+            o.write(tag, record, time || Date())
+          , output
         )
 
   
@@ -74,6 +77,7 @@ Engine = () ->
       return us.keys(output_track)
     
     
+    ## only first argument input is mandatory
     addInput : (input, id, cb) ->
       console.log "add input #{id}"
       if not id

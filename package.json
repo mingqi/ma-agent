@@ -11,6 +11,7 @@
     "tail" : "*",
     "xregexp" : "*",
     "utile" : "*",
-    "MD5" : "*"
+    "hoconfig-js" : "*",
+    "glob" : "*"
   }
 }
