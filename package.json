@@ -10,6 +10,7 @@
     "mysql" : "*",
     "tail" : "*",
     "xregexp" : "*",
-    "utile" : "*"
+    "utile" : "*",
+    "MD5" : "*"
   }
 }

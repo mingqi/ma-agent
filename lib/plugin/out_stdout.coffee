@@ -1,10 +1,14 @@
 module.exports = () ->
   
   return {
+    start : (cb) ->
+      console.log "stdout start"
+      cb()
 
-    receive : (tag, record, time) ->
+    write : (tag, record, time) ->
       console.log "tag=#{tag}, record=#{JSON.stringify(record)}, time=#{time}"
     
-    shutdown : () ->
+    shutdown : (cb) ->
       console.log "stdout shutdown..."          
+      cb()
   }

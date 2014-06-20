@@ -7,7 +7,7 @@
 #   Buffer(config, Upload(config))
 
 
-module.exports = (config, chunkReceiver) ->
+module.exports = (config, output) ->
 
   buffer = []
 
@@ -16,15 +16,28 @@ module.exports = (config, chunkReceiver) ->
       chunkReceiver(buffer)
       buffer = []
 
-  setInterval(collectBuffer, config.flush_interval * 1000)
-   
+  intervalObj = null 
+
   return {
-    receive : (tag, record, time) ->
+
+    start : (cb) ->
+      output.start((err) ->
+        if not err
+          intervalObj = setInterval(collectBuffer, config.flush_interval * 1000)
+        cb(err)
+      )
+
+    write : (tag, record, time) ->
       buffer.push([tag, record, time])
       if buffer.length >= config.buffer_size
         collectBuffer() 
 
-    shutdown : () ->
+    shutdown : (cb) ->
       if buffer.length > 0
         collectBuffer()
+
+      if intervalObj
+        clearInterval(intervalObj)
+
+      output.shutdown(cb)
   }

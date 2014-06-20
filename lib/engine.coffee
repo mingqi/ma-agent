@@ -1,48 +1,54 @@
 events = require('events');
 utile = require 'utile'
 async = require 'async'
+us = require 'underscore'
 
 empty_cb = `function (err){}`
 
 wrapPlugin = (type, plugin) ->
   ## avoid plugin was started more than once 
   started = false
-  return {
-    start : (emit, cb) ->
-      cb ||= empty_cb
-      if type == 'output'
-        ## output only have one parameter cb
-        cb = emit 
 
-      start_cb = (err) ->
-          if err
-            started = false
-          cb(err)
-         
-      if not started
-        started = true
+  plugin_start = plugin.start
+  plugin_shutdown = plugin.shutdown
+  start = (emit, cb) ->
+    cb ||= empty_cb
+    if type == 'output'
+      ## output only have one parameter cb
+      cb = emit 
 
-        if type == 'input'
-          args = [emit, start_cb]
-        else
-          args = [start_cb]
+    start_cb = (err) ->
+      if err
+        started = false
+      cb(err)
+       
+    if not started
+      started = true
 
-        plugin.start.apply(plugin, args)
+      if type == 'input'
+        args = [emit, start_cb]
       else
-        cb()
-    
-    shutdown : (cb) ->
-      cb ||= empty_cb
-      if started
-        plugin.shutdown((err) ->
-          if not err
-            started = false
-          cb(err)
-        )
-      else
-        cb()
-    } 
+        args = [start_cb]
 
+      plugin_start.apply(plugin, args)
+    else
+      cb()
+  
+  shutdown = (cb) ->
+    cb ||= empty_cb
+    if started
+      plugin_shutdown((err) ->
+        if not err
+          started = false
+        cb(err)
+      )
+    else
+      cb()
+
+  plugin.start = start
+  plugin.shutdown = shutdown
+  
+  return plugin 
 
 Engine = () ->
   inputs = []
@@ -56,16 +62,20 @@ Engine = () ->
     for [match, output] in outputs
       if match == tag
         setImmediate(() ->
-          output.receive(tag, record, time || Date() )            
+          output.write(tag, record, time || Date() )            
         )
-
-    output = wrapPlugin('output', output)
-    index = outputs.push([match, output]) - 1
-    output_track[id] = index
 
   
   return {
-    add_input : (input, id, cb) ->
+    inputIds : () ->
+      return us.keys(input_track)
+
+    outputIds : () ->
+      return us.keys(output_track)
+    
+    
+    addInput : (input, id, cb) ->
+      console.log "add input #{id}"
       if not id
         id = utile.randomString(5)
 
@@ -80,7 +90,8 @@ Engine = () ->
       else
         cb(null, id) if cb
 
-    add_output : (match, output, id, cb) ->
+    addOutput : (match, output, id, cb) ->
+      console.log "add output #{id}"
       if not id
         id = utile.randomString(5)
 
@@ -96,7 +107,8 @@ Engine = () ->
         cb(null, id) if cb
 
 
-    remove_input : (id, cb) ->
+    removeInput : (id, cb) ->
+      console.log "remove input #{id}"
       index = input_track[id]
       input = inputs[index]
       inputs.splice(index, 1) 
@@ -106,7 +118,8 @@ Engine = () ->
       else
         cb() if cb
     
-    remove_output : (id, cb) ->
+    removeOutput : (id, cb) ->
+      console.log "remove output #{id}"
       index = output_track[id]
       output = outputs[index]
       outputs.splice(index, 1) 
@@ -174,4 +187,4 @@ Engine = () ->
         )
     }
 
-module.exports = Engine()
+module.exports = Engine

@@ -3,6 +3,7 @@ mysql  = require('mysql');
 module.exports = (config) ->
 
   query = (emit) ->
+    console.log "sql to query"
     conn = mysql.createConnection({
       host : config.host,
       port: config.port,
@@ -18,10 +19,15 @@ module.exports = (config) ->
         emit("tsd", {metric: config.metric, value: value})
     )
 
+  interval_obj = null
   return {
-    start : (emit) ->
-      setInterval(query, config.interval * 1000, emit)
+    start : (emit, cb) ->
+      console.log "sql start..."
+      interval_obj = setInterval(query, config.interval * 1000, emit)
+      cb()
     
-    shutdown : () ->
-      console.log "shutdonw..."
+    shutdown : (cb) ->
+      console.log "sql shutdonw... #{interval_obj}"
+      clearInterval(interval_obj) if interval_obj
+      cb()
   }
