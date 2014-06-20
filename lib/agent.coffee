@@ -31,7 +31,7 @@ module.exports = Agent = (options, plugin_config) ->
     flush_interval : buffer_flush
     }))
   
-  engine.addOutput('tsd', stdout())
+  # engine.addOutput('tsd', stdout())
 
   config_path = plugin_config 
   if not fs.existsSync(config_path)
