@@ -10,7 +10,10 @@ module.exports = (config) ->
       tail.on("line", (line) -> 
         m = xregexp.exec(line, x)
         if m and m.value
-          emit("tsd", {metric: config.metric, value: parseInt(m.value)})
+          emit({
+            tag: 'tsd',
+            record: {metric: config.metric, value: parseInt(m.value)}
+          })
       );
       
       cb()

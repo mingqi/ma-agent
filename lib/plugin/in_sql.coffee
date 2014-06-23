@@ -16,7 +16,10 @@ module.exports = (config) ->
       if rows? and rows.length > 0
         value = rows[0][fields[0].name]
         conn.destroy()
-        emit("tsd", {metric: config.metric, value: value})
+        emit({
+          tag: 'tsd',
+          record: {metric: config.metric, value: value}
+        })
     )
 
   interval_obj = null

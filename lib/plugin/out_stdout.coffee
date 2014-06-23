@@ -7,7 +7,7 @@ module.exports = () ->
       console.log "stdout start"
       cb()
 
-    write : (tag, record, time) ->
+    write : ({tag, record, time}) ->
       console.log "stdout: tag=#{tag}, record=#{JSON.stringify(record)}, time=#{time}"
     
     shutdown : (cb) ->

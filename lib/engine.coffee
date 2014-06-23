@@ -3,131 +3,80 @@ utile = require 'utile'
 async = require 'async'
 us = require 'underscore'
 util = require 'util'
-
 empty_cb = `function (err){}`
 
-wrapPlugin = (type, plugin) ->
-  ## avoid plugin was started more than once 
-  started = false
+global.logger = logger = winston = require 'winston'
 
-  plugin_start = plugin.start
-  plugin_shutdown = plugin.shutdown
-  start = (emit, cb) ->
-    cb ||= empty_cb
-    if type == 'output'
-      ## output only have one parameter cb
-      cb = emit 
-
-    start_cb = (err) ->
-      if err
-        started = false
-      cb(err)
-       
-    if not started
-      started = true
-
-      if type == 'input'
-        args = [emit, start_cb]
-      else
-        args = [start_cb]
-
-      plugin_start.apply(plugin, args)
-    else
-      cb()
-  
-  shutdown = (cb) ->
-    cb ||= empty_cb
-    if started
-      plugin_shutdown((err) ->
-        if not err
-          started = false
-        cb(err)
-      )
-    else
-      cb()
-
-  plugin.start = start
-  plugin.shutdown = shutdown
-  
-  return plugin 
 
 Engine = () ->
   inputs = []
   outputs = []
-  input_track = {}
-  output_track = {}
   eventEmitter = new events.EventEmitter();
+
   started = false
 
-  emit = (tag, record, time) ->
+  emit = (data) ->
+    data.time ||= Date()
     for [match, output] in outputs
-      if match == tag
+      if match == data.tag
         setImmediate(
           (o) ->
-            o.write(tag, record, time || Date())
+            o.write(data)
           , output
         )
 
-  
+  indexOfOutput = (match, output) ->
+    for i in [0...outputs.length]
+      [m, o] = outputs[i]
+      return i if m == match and o == output
+    return -1
+ 
   return {
-    inputIds : () ->
-      return us.keys(input_track)
-
-    outputIds : () ->
-      return us.keys(output_track)
-    
     
     ## only first argument input is mandatory
-    addInput : (input, id, cb) ->
-      console.log "add input #{id}"
-      if not id
-        id = utile.randomString(5)
+    addInput : (input, cb) ->
+      if inputs.indexOf(input) >= 0
+        cb() 
+        return 
 
-      input = wrapPlugin('input',input)
-      index = inputs.push(input) - 1
-      input_track[id] = index
+      inputs.push(input)
 
       if started
-        input.start(emit, (err) ->
-          cb(err, id) if cb
-        )
+        input.start(emit, cb)
+
       else
-        cb(null, id) if cb
+        cb(null) if cb
 
-    addOutput : (match, output, id, cb) ->
-      console.log "add output #{id}"
-      if not id
-        id = utile.randomString(5)
+    addOutput : (match, output, cb) ->
+      if indexOfOutput(match, output) >= 0
+        cb()
 
-      output = wrapPlugin('output', output)
-      index = outputs.push([match, output]) - 1
-      output_track[id] = index
-
+      outputs.push([match, output])
       if started
-        output.start((err) ->
-          cb(err, id) if cb
-        )  
+        output.start(cb)
+
       else
-        cb(null, id) if cb
+        cb(null) if cb
 
+    removeInput : (input, cb) ->
+      index = inputs.indexOf(input)
+      if index < 0
+        cb() if cb
+        return
 
-    removeInput : (id, cb) ->
-      console.log "remove input #{id}"
-      index = input_track[id]
-      input = inputs[index]
       inputs.splice(index, 1) 
-      delete input_track[id]
       if started
         input.shutdown(cb)
       else
         cb() if cb
     
-    removeOutput : (id, cb) ->
-      console.log "remove output #{id}"
-      index = output_track[id]
-      output = outputs[index]
+    removeOutput : (match, output, cb) ->
+      index = indexOfOutput(match, output)
+      if index < 0
+        cb() if cb
+        return
+
       outputs.splice(index, 1) 
-      delete output_track[id]
       if started
         output.shutdown(cb)
       else

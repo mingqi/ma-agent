@@ -12,6 +12,8 @@
     "xregexp" : "*",
     "utile" : "*",
     "hoconfig-js" : "*",
-    "glob" : "*"
+    "glob" : "*",
+    "verror" : "*",
+    "winston" : "*"
   }
 }
