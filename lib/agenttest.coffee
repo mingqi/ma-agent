@@ -10,16 +10,16 @@ buffer_test = require './plugin/out_buffer_test'
 tail = require './plugin/in_tail'
 
 engine = Engine()
-# engine.addInput(sql({
-#   host: 'dev.monitorat.com'
-#   port: 3306
-#   user: 'ma_readonly'
-#   password: 'ma_readonlyonly'
-#   database: 'tsclogdb'
-#   interval: 1
-#   metric: 'detail_weblogs'
-#   query: 'select count(*) from detail_weblogs where add_date > now() - interval 5 minute'
-#   }))
+engine.addInput(sql({
+  host: 'dev.monitorat.com'
+  port: '3306'
+  user: 'ma_readonly'
+  password: 'ma_readonlyonly'
+  database: 'tsclogdb'
+  interval: 10
+  metric: 'detail_weblogs'
+  query: 'select count(*) from detail_weblogs where add_date > now() - interval 5 minute'
+  }))
 engine.addInput(testinput({interval: 1}))
 
 # engine.add_outout('tsd', upload('/tsd', 'tsd'))
@@ -49,5 +49,5 @@ engine.addOutput('tsd', upload({
 #   }))
 
 engine.start((err) ->
-  console.log err    
+  throw err
 )

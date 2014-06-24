@@ -1,12 +1,22 @@
 mysql  = require('mysql');
+assert = require 'assert'
+
+present = (config, properties) ->
+  for p in properties
+    assert.ok(config[p], "#{p} is required for sql plugin")
 
 module.exports = (config) ->
+  present(config, ['metric', 'host', 'port', 'user', 'password', 'database', 'query'])
+  port = parseInt(config.port)
+  assert.ok(port, "port must be a number: #{config.port}")
+  assert.ok(parseInt(config.interval), "interval must be number: #{config.interval}") if config.interval
+  interval = parseInt(config.interval) || 10
 
   query = (emit) ->
     console.log "sql to query"
     conn = mysql.createConnection({
       host : config.host,
-      port: config.port,
+      port: port,
       user: config.user,
       password: config.password,
       database: config.database
@@ -26,7 +36,7 @@ module.exports = (config) ->
   return {
     start : (emit, cb) ->
       console.log "sql start..."
-      interval_obj = setInterval(query, config.interval * 1000, emit)
+      interval_obj = setInterval(query, interval * 1000, emit)
       cb()
     
     shutdown : (cb) ->

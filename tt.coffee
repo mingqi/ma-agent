@@ -92,9 +92,15 @@ tt = () ->
 #   console.log err
 # )
 
+assert = require 'assert'
 
-ff = ({name: n, title: t }) -> 
-  console.log n
-  console.log t
+f = () ->
+  try
+    assert.equal(1,2, "message")
+  catch e
+    console.log e
+  
 
-ff({name : 'mingqi' , title: 'sde'})
+f()
+
+console.log module.parent

@@ -13,11 +13,7 @@ module.exports = (config) ->
     start : (emit, cb) ->
       console.log "intest start..."
       interval_obj = setInterval(query, config.interval * 1000, emit)
-      # emit({
-      #   tag: 'tsd'
-      #   record: { count: count+=1 }
-      #   })
-      cb()
+      cb(new Error('some error on test input'))
     
     shutdown : (cb) ->
       console.log "intest shutdonw... #{interval_obj}"

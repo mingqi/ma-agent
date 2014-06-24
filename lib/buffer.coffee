@@ -20,6 +20,7 @@ config can below options:
 ###
 
 async = require 'async'
+assert = require 'assert'
 
 retry = (times, wait_sec, task, cb) ->
   did = 0 
@@ -40,10 +41,13 @@ retry = (times, wait_sec, task, cb) ->
     cb)
 
 module.exports = (config, output) ->
-  buffer_size = config.buffer_size
-  flush_interval = config.flush_interval
-  retry_times = config.retry_times || 1
-  retry_interval = config.retry_interval || 1 
+  buffer_size = parseInt(config.buffer_size)
+  flush_interval = parseInt(config.flush_interval)
+  assert.ok(buffer_size, "option buffer_size is required for buffered output plugin")  
+  assert.ok(flush_interval, "option flush_interval is required for buffered output plugin")  
+
+  retry_times = parseInt(config.retry_times) || 1
+  retry_interval = parseInt(config.retry_interval) || 1 
 
   buffer = []
   collectBuffer = () ->

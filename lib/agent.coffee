@@ -60,6 +60,7 @@ module.exports = Agent = (options, plugin_config) ->
     start : () ->
       engine.start((err) ->
         console.log "engine started"
+
       )
     
     shutdown : () ->
@@ -69,10 +70,11 @@ module.exports = Agent = (options, plugin_config) ->
   }
 
 
-args = process.argv[2..]
-if args.length !=2
-  console.error "useage: agent <agent-config-file> <plguin-config-file>"
-  process.exit(1)
+if not module.parent
+  args = process.argv[2..]
+  if args.length !=2
+    console.error "useage: agent <agent-config-file> <plguin-config-file>"
+    process.exit(1)
 
-agent = Agent(hoconfig(args[0]), args[1])
-agent.start()
+  agent = Agent(hoconfig(args[0]), args[1])
+  agent.start()
