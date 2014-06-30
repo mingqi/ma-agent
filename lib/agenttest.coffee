@@ -25,6 +25,7 @@ engine = Engine()
 # engine.add_outout('tsd', upload('/tsd', 'tsd'))
 # engine.add_input(in_test({interval : 1}))
 engine.addInput(tail({
+  posfile : '/var/tmp/tail.pos'
   metric : 'loadtime_detail'
   path : '/var/tmp/test.log*'
   pattern : '[^|]+\\|[^|]+\\|(?<value>[^|]+)\\|[^|]+\\|[^|]+\\|[^|]+detail\\.html'
@@ -50,4 +51,10 @@ engine.addOutput('tsd', stdout())
 
 engine.start((err) ->
   throw err if err
+)
+
+process.on('SIGINT', () ->
+  engine.shutdown((err) ->
+    throw err if err
+  )
 )

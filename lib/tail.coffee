@@ -55,7 +55,7 @@ class Tail extends events.EventEmitter
           @emit('error', err)
           return cb()
 
-        @bookmarks[block.fd] += bytesRead        
+        @bookmarks[block.fd] = start + bytesRead        
         data = buff.toString('utf-8')
         @buffer += data
         parts = @buffer.split(@separator)
@@ -70,12 +70,17 @@ class Tail extends events.EventEmitter
       )
     )
 
-  _checkOpen : (start) ->
+  _checkOpen : (start, inode) ->
+    ###
+      try to open file
+      start: the postion to read file start from. default is 0
+      inode: if this parameters present, the start take effect if only file has same inode
+    ###
     try 
       fd = fs.openSync(@filename, 'r')
       stat = fs.fstatSync(fd)
       @current = {fd: fd, inode: stat.ino}
-      if start? and start >=0
+      if start? and start >=0 and ( !inode or inode == stat.ino )
         @bookmarks[fd] = start
       else
         @bookmarks[fd] = stat.size
@@ -88,12 +93,12 @@ class Tail extends events.EventEmitter
     
 
   constructor:(@filename,  @options = {}) ->    
-    @separator = options.separator || '\n'
+    @separator = options?.separator? || '\n'
     @buffer = ''
     @queue = new SeriesQueue(@_readBlock)
     @isWatching = false
     @bookmarks = {}
-    @_checkOpen(@options.start)
+    @_checkOpen(@options.start, @options.inode)
     @interval = @options.interval || 1000
     @watch()
     

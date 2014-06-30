@@ -1,6 +1,16 @@
 Tail = require('./lib/tail').Tail
 
-t = new Tail('/var/tmp/test.log', {start: 0})
-t.on('line', (line)->
-  console.log line
+dirty = require 'dirty'
+db = dirty('/var/tmp/dirty.db')
+db.on('load', () ->
+  console.log "db.on load"
+  console.log db.get('mingqi')
 )
+console.log "----------"
+console.log db.get('mingqi')
+
+# db.set('mingqi', 'aaa')
+
+# db.on('drain', () ->
+#   console.log "db.on drain"
+# )

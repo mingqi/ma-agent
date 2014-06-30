@@ -4,17 +4,21 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "underscore" : "*",
-    "moment" : "*",
-    "async" : "*",
-    "mysql" : "*",
-    "tail" : "*",
-    "xregexp" : "*",
-    "utile" : "*",
-    "hoconfig-js" : "*",
-    "glob" : "*",
-    "verror" : "*",
-    "winston" : "*",
-    "glob" : "*"
+    "async": "*",
+    "glob": "*",
+    "hoconfig-js": "*",
+    "moment": "*",
+    "mysql": "*",
+    "nedb": "*",
+    "tail": "*",
+    "underscore": "*",
+    "utile": "*",
+    "verror": "*",
+    "winston": "*",
+    "xregexp": "*"
+  },
+  "devDependencies" : {
+    "sleep" : "*",
+    "commander" : "*"
   }
 }
