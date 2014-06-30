@@ -15,7 +15,8 @@
     "utile": "*",
     "verror": "*",
     "winston": "*",
-    "xregexp": "*"
+    "xregexp": "*",
+    "MD5" : "*"
   },
   "devDependencies" : {
     "sleep" : "*",

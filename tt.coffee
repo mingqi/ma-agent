@@ -1,16 +1,30 @@
-Tail = require('./lib/tail').Tail
+Engine = require './lib/engine'
+stdout = require './lib/plugin/out_stdout'
+in_test = require './lib/plugin/in_test'
 
-dirty = require 'dirty'
-db = dirty('/var/tmp/dirty.db')
-db.on('load', () ->
-  console.log "db.on load"
-  console.log db.get('mingqi')
+in1 = in_test({tag:'test',interval: 1})
+# in2 = in_test({tag:'test',interval: 1})
+out1 = stdout()
+engine = Engine()
+engine.addInput(in1)
+# engine.addOutput('test', stdout())
+
+engine.start((err) ->
+  console.log "engine started: #{err}"
+  # engine.addInput(in2)
 )
-console.log "----------"
-console.log db.get('mingqi')
 
-# db.set('mingqi', 'aaa')
+setTimeout(
+  () ->
+    engine.addOutput('test', out1)
+  , 3000 
+  )
 
-# db.on('drain', () ->
-#   console.log "db.on drain"
-# )
+setTimeout(
+  () ->
+    engine.removeInput(in1, (err) ->
+      console.log err
+    )
+  , 6000 
+  )
+

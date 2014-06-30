@@ -35,52 +35,51 @@ Engine = () ->
     
     ## only first argument input is mandatory
     addInput : (input, cb) ->
+      cb = empty_cb if not cb
       if inputs.indexOf(input) >= 0
-        cb() 
-        return 
+        return cb() 
 
       inputs.push(input)
 
       if started
         input.start(emit, cb)
-
       else
-        cb(null) if cb
+        cb(null) 
 
     addOutput : (match, output, cb) ->
+      cb = empty_cb if not cb
       if indexOfOutput(match, output) >= 0
         cb()
 
       outputs.push([match, output])
       if started
         output.start(cb)
-
       else
-        cb(null) if cb
+        cb(null) 
 
     removeInput : (input, cb) ->
+      cb = empty_cb if not cb
       index = inputs.indexOf(input)
       if index < 0
-        cb() if cb
-        return
+        return cb() 
 
       inputs.splice(index, 1) 
       if started
         input.shutdown(cb)
       else
-        cb() if cb
+        cb()
     
     removeOutput : (match, output, cb) ->
+      cb = empty_cb if not cb
       index = indexOfOutput(match, output)
       if index < 0
-        cb() if cb
-        return
+        return cb() 
 
       outputs.splice(index, 1) 
       if started
         output.shutdown(cb)
       else
-        cb() if cb 
+        cb() 
      
     start : (callback) ->
       started = true

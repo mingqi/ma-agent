@@ -1,22 +1,23 @@
 mysql  = require('mysql');
 
 module.exports = (config) ->
-
+  interval_obj = null
   count = 0
+  metric = config.metric
   query = (emit) ->
       emit({
-        tag: 'tsd'
-        record: { count: count+=1 }
+        tag: config.tag
+        record: { metric: metric, count: count+=1 }
         })
 
   return {
     start : (emit, cb) ->
       console.log "intest start..."
       interval_obj = setInterval(query, config.interval * 1000, emit)
-      cb(new Error('some error on test input'))
+      cb()
     
     shutdown : (cb) ->
       console.log "intest shutdonw... #{interval_obj}"
       clearInterval(interval_obj) if interval_obj
-      cb()
+      cb(new Error('has error when shutdown in_test'))
   }
