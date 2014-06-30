@@ -5,11 +5,13 @@ path = require 'path'
 us = require 'underscore'
 dirty = require 'dirty'
 util = require 'util'
+fs = require 'fs'
 
 module.exports = (config) ->
   tails = {}
   posdb = null
   flush_interval = null
+  inodes = []
 
   unwatch = (p) ->
     mem = tails[p].unwatch()
@@ -17,13 +19,8 @@ module.exports = (config) ->
     return mem
   
   globFiles = (_path) ->
-    glob.sync(_path).map(
-      (f) ->
-        try
-          path.resolve(f) 
-        catch e
-          console.log e.stack      
-        # console.log path
+    glob.sync(_path).map((f) -> 
+      path.resolve(f)
     )
 
   flushTails =  (listener) ->
@@ -31,11 +28,21 @@ module.exports = (config) ->
     target_paths = globFiles(config.path)
     to_add = us.difference(target_paths, curr_paths) 
     to_remove = us.difference(curr_paths, target_paths)
+    target_inodes = us.reduce(
+      target_paths, 
+      (mem,p) -> 
+        mem[p] = fs.statSync(p).ino
+        return mem
+      ,
+      {}
+      )
     for f in to_add
-      console.log f
-      tails[f] = new Tail(f, {start: 0})
+      inode = target_inodes[f]
+      start = if us.contains(inodes, inode) then null else 0
+      tails[f] = new Tail(f, {start: start})
       tails[f].on('line', listener)
 
+    inodes = us.values(target_inodes)
     for f in to_remove
       unwatch(f)
 
@@ -54,7 +61,9 @@ module.exports = (config) ->
           })
       posdb = dirty(config.posfile) 
       posdb.on('load', () ->
+
         for f in globFiles(config.path)
+          inodes.push(fs.statSync(f).ino)
           mem = posdb.get(f)
           if mem
             tail_options = {start: mem.pos, inode: mem.inode}
