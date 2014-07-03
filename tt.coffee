@@ -1,30 +1,16 @@
-Engine = require './lib/engine'
-stdout = require './lib/plugin/out_stdout'
-in_test = require './lib/plugin/in_test'
+# config = require './lib/config'
+# config.remote_backup('localhost',  9090, '/var/tmp/1.json', (err, config) ->
+#   if err
+#     console.log err
+#   else
+#     console.log config
+# )
+us = require 'underscore'
 
-in1 = in_test({tag:'test',interval: 1})
-# in2 = in_test({tag:'test',interval: 1})
-out1 = stdout()
-engine = Engine()
-engine.addInput(in1)
-# engine.addOutput('test', stdout())
+a = {name: 'mingqi', title: 'sde'}
 
-engine.start((err) ->
-  console.log "engine started: #{err}"
-  # engine.addInput(in2)
+us.map(a, (bb) ->
+  console.log "---------"
+  console.log bb
+  return 1
 )
-
-setTimeout(
-  () ->
-    engine.addOutput('test', out1)
-  , 3000 
-  )
-
-setTimeout(
-  () ->
-    engine.removeInput(in1, (err) ->
-      console.log err
-    )
-  , 6000 
-  )
-

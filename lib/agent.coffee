@@ -19,7 +19,7 @@ _hashConfig = (config) ->
     k + ':' + config[k] 
   md5(JSON.stringify(pair_list.join(',')))
 
-module.exports = Agent = (options, plugin_config) -> 
+module.exports = Agent = (configer, inputs, outputs, options) -> 
   remote_host = options.remote_host || 'localhost'
   remote_port = options.remote_port || 9090
   buffer_size = options.buffer_size || 1000
@@ -29,6 +29,11 @@ module.exports = Agent = (options, plugin_config) ->
   input_index = {}
   engine = Engine()
 
+  for input in inputs
+    engine.addInput(input)
+
+  for [match, output] in outputs
+    engine.addOutput(match, output)
 
   # engine.addOutput('tsd', upload({
   #   host : remote_host
@@ -38,50 +43,37 @@ module.exports = Agent = (options, plugin_config) ->
   #   flush_interval : buffer_flush
   #   }))
   
-  engine.addOutput('tsd', stdout())
+  # engine.addOutput('tsd', stdout())
 
   flushInput = () ->
-    config_path = plugin_config 
-    if not fs.existsSync(config_path)
-      throw new Error("not exists dir or file on #{config_path}")
+    configer( (err, config) ->
+      target = {}
+      for in_conf in config
+        target[_hashConfig(in_conf)] = in_conf
 
-    stat = fs.statSync(config_path) 
-    if stat.isFile()
-      config = hoconfig(options.config_file)
-    else
-      config = us.reduce(
-        glob.sync(path.join(config_path, '*.conf')),
-        (c, file) ->
-          us.extend(c, hoconfig(file))
-        , 
-        {})
+      to_add = us.difference(us.keys(target), us.keys(input_config_index))
+      to_remove = us.difference(us.keys(input_config_index), us.keys(target))
 
-    target = {}
-    for metric_name, in_conf of config
-      us.extend(in_conf, {metric: metric_name})
-      target[_hashConfig(in_conf)] = in_conf
+      for remove_index in to_remove
+        input = input_index[remove_index]
+        engine.removeInput(input)
+        delete input_index[remove_index]
+        delete input_config_index[remove_index]
 
-    to_add = us.difference(us.keys(target), us.keys(input_config_index))
-    to_remove = us.difference(us.keys(input_config_index), us.keys(target))
+      for add_index in to_add
+        in_conf = target[add_index]
+        type = in_conf.type
+        plugin = INPUT_PLUGINS[type]
+        if not plugin
+          throw new Error("type #{type} is not supported")
+        input = plugin(in_conf)
+        engine.addInput(input, (err) ->
+          if not err
+            input_index[add_index] = input
+            input_config_index[add_index] = in_conf
+        )
+    )
 
-    for remove_index in to_remove
-      input = input_index[remove_index]
-      engine.removeInput(input)
-      delete input_index[remove_index]
-      delete input_config_index[remove_index]
-
-    for add_index in to_add
-      in_conf = target[add_index]
-      type = in_conf.type
-      plugin = INPUT_PLUGINS[type]
-      if not plugin
-        throw new Error("type #{type} is not supported")
-      input = plugin(in_conf)
-      engine.addInput(input, (err) ->
-        if not err
-          input_index[add_index] = input
-          input_config_index[add_index] = in_conf
-      )
 
   return {
     start : () ->
@@ -99,11 +91,3 @@ module.exports = Agent = (options, plugin_config) ->
   }
 
 
-if not module.parent
-  args = process.argv[2..]
-  if args.length !=2
-    console.error "useage: agent <agent-config-file> <plguin-config-file>"
-    process.exit(1)
-
-  agent = Agent(hoconfig(args[0]), args[1])
-  agent.start()
