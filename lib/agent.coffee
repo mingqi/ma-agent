@@ -19,11 +19,7 @@ _hashConfig = (config) ->
     k + ':' + config[k] 
   md5(JSON.stringify(pair_list.join(',')))
 
-module.exports = Agent = (configer, inputs, outputs, options) -> 
-  remote_host = options.remote_host || 'localhost'
-  remote_port = options.remote_port || 9090
-  buffer_size = options.buffer_size || 1000
-  buffer_flush = options.buffer_flush || 3
+module.exports = Agent = (configer, inputs, outputs) -> 
 
   input_config_index = {}
   input_index = {}
@@ -35,15 +31,6 @@ module.exports = Agent = (configer, inputs, outputs, options) ->
   for [match, output] in outputs
     engine.addOutput(match, output)
 
-  # engine.addOutput('tsd', upload({
-  #   host : remote_host
-  #   port : remote_port
-  #   uri : '/tsd'
-  #   buffer_size : buffer_size
-  #   flush_interval : buffer_flush
-  #   }))
-  
-  # engine.addOutput('tsd', stdout())
 
   flushInput = () ->
     configer( (err, config) ->

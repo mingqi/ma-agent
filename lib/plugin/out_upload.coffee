@@ -3,9 +3,19 @@ zlib = require 'zlib'
 buffer = require '../buffer'
 VError = require('verror');
 
+###
+remote_host
+remote_port
+license_key
+
+# buffer config
+....
+
+###
+
 Upload = (config) ->
-  remote_host = config.host
-  remote_port = config.port
+  remote_host = config.remote_host
+  remote_port = config.remote_port
   remote_uri = config.uri
 
   return {
@@ -31,6 +41,7 @@ Upload = (config) ->
         headers : {
           'Content-Type' : 'application/json'
           'Content-Encoding' : 'gzip'
+          'licenseKey' : config.license_key
         }
       }
 

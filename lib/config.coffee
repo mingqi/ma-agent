@@ -27,7 +27,7 @@ exports.local = local = (local_path, cb) ->
   cb(null, config)
 
 
-exports.remote = remote= (host, port, cb) ->
+exports.remote = remote= (host, port, licenceKey, cb) ->
   buffs = []
   options = {
       host: host 
@@ -36,6 +36,8 @@ exports.remote = remote= (host, port, cb) ->
       path: /aconfig/+os.hostname()
       headers : {
         'Accept-Encoding' : 'gzip'
+        'licen
+        seKey' : licenceKey
       }
     }
 

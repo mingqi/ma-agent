@@ -1,17 +1,21 @@
+version = require '../version'
+os = require 'os'
+
+# interval
 module.exports = (config) ->
   interval_obj = null
   count = 0
   metric = config.metric
-  query = (emit) ->
+  report = (emit) ->
       emit({
-        tag: config.tag
-        record: { metric: metric, value: count+=1 }
+        tag: 'host',
+        record: { hostname: os.hostname(), version: version }
         })
 
   return {
     start : (emit, cb) ->
-      console.log "intest start..."
-      interval_obj = setInterval(query, config.interval * 1000, emit)
+      console.log "in_agent start..."
+      interval_obj = setInterval(report, config.interval * 1000, emit)
       cb()
     
     shutdown : (cb) ->

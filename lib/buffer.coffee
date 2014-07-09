@@ -12,7 +12,7 @@ output_plguin should be a plugin instance with three methods:
     the chunk is the array of [tag, record, time]
 
 config can below options:
-- flush_interval
+- buffer_flush
 - buffer_size
 - retry_times
 - retry_interval
@@ -42,9 +42,9 @@ retry = (times, wait_sec, task, cb) ->
 
 module.exports = (config, output) ->
   buffer_size = parseInt(config.buffer_size)
-  flush_interval = parseInt(config.flush_interval)
+  buffer_flush = parseInt(config.buffer_flush)
   assert.ok(buffer_size, "option buffer_size is required for buffered output plugin")  
-  assert.ok(flush_interval, "option flush_interval is required for buffered output plugin")  
+  assert.ok(buffer_flush, "option buffer_flush is required for buffered output plugin")  
 
   retry_times = parseInt(config.retry_times) || 1
   retry_interval = parseInt(config.retry_interval) || 1 
@@ -72,7 +72,7 @@ module.exports = (config, output) ->
     start : (cb) ->
       output.start((err) ->
         if not err
-          intervalObj = setInterval(collectBuffer, flush_interval * 1000)
+          intervalObj = setInterval(collectBuffer, buffer_flush * 1000)
         cb(err)
       )
 
