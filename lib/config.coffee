@@ -36,8 +36,7 @@ exports.remote = remote= (host, port, licenceKey, cb) ->
       path: /aconfig/+os.hostname()
       headers : {
         'Accept-Encoding' : 'gzip'
-        'licen
-        seKey' : licenceKey
+        'licenseKey' : licenceKey
       }
     }
 
@@ -47,6 +46,7 @@ exports.remote = remote= (host, port, licenceKey, cb) ->
     ) 
 
     res.on('end',  () ->
+      console.log res.statusCode
       buffer = Buffer.concat(buffs);
       zlib.gunzip(buffer, (err, result) ->
         if err

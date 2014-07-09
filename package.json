@@ -9,14 +9,13 @@
     "hoconfig-js": "*",
     "moment": "*",
     "mysql": "*",
-    "nedb": "*",
-    "tail": "*",
     "underscore": "*",
     "utile": "*",
     "verror": "*",
     "winston": "*",
     "xregexp": "*",
-    "MD5" : "*"
+    "MD5" : "*",
+    "dirty" : "*"
   },
   "devDependencies" : {
     "sleep" : "*",
