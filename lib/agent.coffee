@@ -9,7 +9,7 @@ fs = require 'fs'
 md5 = require 'MD5'
 
 INPUT_PLUGINS = {
-  sql : require './plugin/in_sql'
+  dbquery : require './plugin/in_sql'
   tail : require './plugin/in_tail'
   test : require './plugin/in_test'
 }

@@ -46,17 +46,17 @@ exports.remote = remote= (host, port, licenceKey, cb) ->
     ) 
 
     res.on('end',  () ->
-      console.log res.statusCode
       buffer = Buffer.concat(buffs);
       zlib.gunzip(buffer, (err, result) ->
+
         if err
           cb(VError(err, "failed to gunzip server response, content length #{buffer.length}"))       
         else
           try
             config = JSON.parse(result)
-            cb(null, config)
           catch e
-            cb(new VError(e, "failed parse json object"))
+            return cb(new VError(e, "failed parse json object"))
+          cb(null, config)
       )
     )
   )

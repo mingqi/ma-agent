@@ -1,16 +1,15 @@
-# config = require './lib/config'
-# config.remote_backup('localhost',  9090, '/var/tmp/1.json', (err, config) ->
-#   if err
-#     console.log err
-#   else
-#     console.log config
-# )
-us = require 'underscore'
+mysql = require('mysql');
 
-a = {name: 'mingqi', title: 'sde'}
-
-us.map(a, (bb) ->
-  console.log "---------"
-  console.log bb
-  return 1
+conn = mysql.createConnection({
+  host : 'dev.monitorat.com'
+  port: 3306,
+  user: 'ma_readonly',
+  password: 'ma_readonlyonly'
+  })
+conn.connect()
+conn.query('select count(*) from tsclogdb.detail_weblogs where add_date > now() - interval 5', (err, rows,fields) ->
+  if rows? and rows.length > 0
+    value = rows[0][fields[0].name]
+    conn.destroy()
+    console.log value
 )

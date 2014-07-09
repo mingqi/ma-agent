@@ -1,12 +1,22 @@
-mysql  = require('mysql');
+mysql = require('mysql');
 assert = require 'assert'
+
+###
+  metric
+  host
+  port
+  user
+  pwd
+  database
+  query
+###
 
 present = (config, properties) ->
   for p in properties
     assert.ok(config[p], "#{p} is required for sql plugin")
 
 module.exports = (config) ->
-  present(config, ['metric', 'host', 'port', 'user', 'password', 'database', 'query'])
+  present(config, ['metric', 'host', 'port', 'user', 'pwd', 'database', 'query'])
   port = parseInt(config.port)
   assert.ok(port, "port must be a number: #{config.port}")
   assert.ok(parseInt(config.interval), "interval must be number: #{config.interval}") if config.interval
@@ -18,7 +28,7 @@ module.exports = (config) ->
       host : config.host,
       port: port,
       user: config.user,
-      password: config.password,
+      password: config.pwd,
       database: config.database
       })
     conn.connect()

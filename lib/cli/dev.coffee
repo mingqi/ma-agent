@@ -28,11 +28,12 @@ out_host = upload(us.extend(default_options, agentconfig, {
 
 agent = Agent(
   ((cb) -> 
-    config.remote('localhost', 9090, agentconfig.license_key, cb)
+    config.remote(agentconfig.remote_host, agentconfig.remote_port, agentconfig.license_key, cb)
   ), 
   [host({interval: agentconfig.agent_report_interval})], 
   [
     ['tsd', out_upload],
+    ['tsd', stdout()],
     ['host', stdout()],
     ['host', out_host]
   ]
