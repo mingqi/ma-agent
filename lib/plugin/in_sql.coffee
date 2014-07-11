@@ -4,7 +4,7 @@ report = require '../report'
 console.log report
 
 ###
-  metric
+  monitor
   host
   port
   user
@@ -18,7 +18,7 @@ present = (config, properties) ->
     assert.ok(config[p], "#{p} is required for sql plugin")
 
 module.exports = (config) ->
-  present(config, ['metric', 'host', 'port', 'user', 'pwd', 'database', 'query'])
+  present(config, ['monitor', 'host', 'port', 'user', 'pwd', 'database', 'query'])
   port = parseInt(config.port)
   assert.ok(port, "port must be a number: #{config.port}")
   assert.ok(parseInt(config.interval), "interval must be number: #{config.interval}") if config.interval
@@ -44,7 +44,7 @@ module.exports = (config) ->
             value = rows[0][fields[0].name]
             emit({
               tag: 'tsd',
-              record: {metric: config.metric, value: value}
+              record: {metric: config.monitor, value: value}
             })
       finally 
         conn.destroy()      
@@ -54,7 +54,7 @@ module.exports = (config) ->
   return {
     start : (emit, cb) ->
       console.log "sql start..."
-      _report = report.PluginReport(emit, config.metric)
+      _report = report.PluginReport(emit, config.monitor)
       query(emit)
       interval_obj = setInterval(query, interval * 1000, emit)
       cb()

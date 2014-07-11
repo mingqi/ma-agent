@@ -31,13 +31,13 @@ exports.rest = (options, body, callback) ->
         if response.headers['content-encoding'] == 'gzip'
           zlib.gunzip(buffer, (err, result) ->
             if err
-              callback(new Error('illegal gzip content'))
+              return callback(new Error('illegal gzip content'))
             else
               try
-                result = JSON.parse(result)
-                callback(null, response.statusCode, result) 
+                r = JSON.parse(result)
               catch e
                 callback(new Error("bad response, not JSON formant: #{result}"))      
+              callback(null, response.statusCode, r) 
               
           ) 
         else

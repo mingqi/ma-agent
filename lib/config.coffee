@@ -7,6 +7,7 @@ http = require 'http'
 VError = require('verror');
 zlib = require 'zlib'
 hoconfig = require 'hoconfig-js'
+util = require './util'
 
 exports.local = local = (local_path, cb) ->
   if not fs.existsSync(local_path)
@@ -28,44 +29,25 @@ exports.local = local = (local_path, cb) ->
 
 
 exports.remote = remote= (host, port, licenceKey, cb) ->
-  buffs = []
-  options = {
+  util.rest(
+    {
       host: host 
       port: port
       method: 'GET'
-      path: /aconfig/+os.hostname()
+      path: /monitor/+os.hostname()
       headers : {
-        'Accept-Encoding' : 'gzip'
         'licenseKey' : licenceKey
-      }
+      }    
     }
-
-  req = http.request(options, (res) ->
-    res.on('data', (chunk) -> 
-      buffs.push chunk
-    ) 
-
-    res.on('end',  () ->
-      buffer = Buffer.concat(buffs);
-      zlib.gunzip(buffer, (err, result) ->
-
-        if err
-          cb(VError(err, "failed to gunzip server response, content length #{buffer.length}"))       
-        else
-          try
-            config = JSON.parse(result)
-          catch e
-            return cb(new VError(e, "failed parse json object"))
-          cb(null, config)
-      )
-    )
+  , (err, status, result) ->
+      if err
+        return cb(VError(err, "failed to call remote service grab montior list"))       
+      if status != 200
+        return cb(new Error("call /montor return error status #{status}"))
+      cb(null, result)
   )
 
-  req.on('error', (e) ->
-    cb(new VError(e, "failed to send data to #{remote}:#{port}"))
-  )
 
-  req.end()
 
 exports.remote_backup = (host, port, backup_path, callback) ->
   remote(host, port, (err, config) ->

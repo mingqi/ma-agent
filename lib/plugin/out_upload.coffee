@@ -2,6 +2,7 @@ http = require 'http'
 zlib = require 'zlib'
 buffer = require '../buffer'
 VError = require('verror');
+util = require '../util'
 
 ###
 remote_host
@@ -19,51 +20,42 @@ Upload = (config) ->
   remote_uri = config.uri
 
   return {
-    name : 'upload'
     
-    start : (cb) ->
+    start : (callback) ->
       console.log "upload started"
-      cb()    
+      callback()    
 
-    shutdown : (cb) ->
-      cb()
+    shutdown : (callback) ->
+      callback()
 
-    writeChunk : (chunk, cb) ->
+    writeChunk : (chunk, callback) ->
       body = []
       for {tag, record, time} in chunk
         body.push(record)
 
-      options = {
+      util.rest({
         host: remote_host
         port: remote_port
         method: 'POST'
-        path: remote_uri
+        path: remote_uri 
         headers : {
-          'Content-Type' : 'application/json'
-          'Content-Encoding' : 'gzip'
           'licenseKey' : config.license_key
+          }               
         }
-      }
-
-      req = http.request(options, (res) ->
-        res.setEncoding('utf8');
-        res.on('data', (chunk) -> 
-          if res.statusCode != 200
-            cb(new Error("upload service return error response, status=#{res.statusCode}"))
-          console.log "post status is " + res.statusCode
-        ) 
-      )
-
-      req.on('error', (e) ->
-        cb(new VError(e, "failed to send data to #{remote_host}:#{remote_port}"))
-      )
-
-      console.log("there are #{body.length} record ready for send ")
-      zlib.gzip(JSON.stringify(body), (err, result) ->
-        req.write(result);
-        req.end() 
-      )
-     
+      , JSON.stringify(body)
+      , (err, status, result) ->
+          console.log body
+          console.log err
+          console.log status
+          console.log result
+          if err
+            callback(VError(err, "failure on send data to #{remote_host}:#{remote_port}")) 
+          else
+            if status != 200
+              callback(new Error("upload service return error response, status=#{status}"))  
+            else
+              callback()
+        )
   }
 
 

@@ -36,12 +36,12 @@ agent = Agent(
   ), 
   [host({interval: agentconfig.agent_report_interval})], 
   [
-    ['tsd', tsd_upload],
+    # ['tsd', tsd_upload],
     ['tsd', stdout()],
-    ['host', stdout()],
+    # ['host', stdout()],
     # ['host', host_upload]
-    ['report', report_upload]
-    ['report', stdout()]
+    # ['report', report_upload]
+    # ['report', stdout()]
   ]
 )
 

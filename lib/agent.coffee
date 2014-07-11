@@ -34,6 +34,9 @@ module.exports = Agent = (configer, inputs, outputs, options) ->
 
   flushInput = () ->
     configer( (err, config) ->
+      if err
+        console.log err.stack
+        return
       target = {}
       for in_conf in config
         target[_hashConfig(in_conf)] = in_conf
