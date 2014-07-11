@@ -1,5 +1,7 @@
-mysql = require('mysql');
+mysql = require 'mysql'
 assert = require 'assert'
+report = require '../report'
+console.log report
 
 ###
   metric
@@ -22,6 +24,7 @@ module.exports = (config) ->
   assert.ok(parseInt(config.interval), "interval must be number: #{config.interval}") if config.interval
   interval = parseInt(config.interval) || 10
 
+  _report = null
   query = (emit) ->
     console.log "sql to query"
     conn = mysql.createConnection({
@@ -30,22 +33,29 @@ module.exports = (config) ->
       user: config.user,
       password: config.pwd,
       database: config.database
-      })
-    conn.connect()
+    })
     conn.query(config.query, (err, rows,fields) ->
-      if rows? and rows.length > 0
-        value = rows[0][fields[0].name]
-        conn.destroy()
-        emit({
-          tag: 'tsd',
-          record: {metric: config.metric, value: value}
-        })
+      try
+        if err
+          _report("problem", err.message)
+        else
+          _report("ok")
+          if rows? and rows.length > 0
+            value = rows[0][fields[0].name]
+            emit({
+              tag: 'tsd',
+              record: {metric: config.metric, value: value}
+            })
+      finally 
+        conn.destroy()      
     )
 
   interval_obj = null
   return {
     start : (emit, cb) ->
       console.log "sql start..."
+      _report = report.PluginReport(emit, config.metric)
+      query(emit)
       interval_obj = setInterval(query, interval * 1000, emit)
       cb()
     
@@ -53,4 +63,7 @@ module.exports = (config) ->
       console.log "sql shutdonw... #{interval_obj}"
       clearInterval(interval_obj) if interval_obj
       cb()
+
+    problem : () ->
+      return null; 
   }

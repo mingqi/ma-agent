@@ -20,9 +20,13 @@ default_options = {
   buffer_flush : 3
 }
 
-out_upload = upload(us.extend(default_options, agentconfig, {uri: '/tsd'}))
-out_host = upload(us.extend(default_options, agentconfig, {
+tsd_upload = upload(us.extend(default_options, agentconfig, {uri: '/tsd'}))
+host_upload = upload(us.extend(default_options, agentconfig, {
   uri: '/host'
+  buffer_size: 10
+  buffer_flush: 1}))
+report_upload = upload(us.extend(default_options, agentconfig, {
+  uri: '/report'
   buffer_size: 10
   buffer_flush: 1}))
 
@@ -32,10 +36,12 @@ agent = Agent(
   ), 
   [host({interval: agentconfig.agent_report_interval})], 
   [
-    ['tsd', out_upload],
-    ['tsd', stdout()],
+    ['tsd', tsd_upload],
+    # ['tsd', stdout()],
     ['host', stdout()],
-    ['host', out_host]
+    # ['host', host_upload]
+    ['report', report_upload]
+    ['report', stdout()]
   ]
 )
 

@@ -19,7 +19,7 @@ _hashConfig = (config) ->
     k + ':' + config[k] 
   md5(JSON.stringify(pair_list.join(',')))
 
-module.exports = Agent = (configer, inputs, outputs) -> 
+module.exports = Agent = (configer, inputs, outputs, options) -> 
 
   input_config_index = {}
   input_index = {}
@@ -76,5 +76,4 @@ module.exports = Agent = (configer, inputs, outputs) ->
         console.log "engine shutdown"
       )
   }
-
 
