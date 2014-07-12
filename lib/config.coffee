@@ -8,6 +8,8 @@ VError = require('verror');
 zlib = require 'zlib'
 hoconfig = require 'hoconfig-js'
 util = require './util'
+us = require 'underscore'
+async = require 'async'
 
 exports.local = local = (local_path, cb) ->
   if not fs.existsSync(local_path)
@@ -15,7 +17,7 @@ exports.local = local = (local_path, cb) ->
 
   stat = fs.statSync(local_path) 
   if stat.isFile()
-    config = hoconfig(options.config_file)
+    config = hoconfig(local_path)
   else
     config = us.reduce(
       glob.sync(path.join(local_path, '*.conf')),
@@ -23,41 +25,68 @@ exports.local = local = (local_path, cb) ->
         us.extend(c, hoconfig(file))
       , 
       {}) 
-  config = for metric, config_item of config
-    us.extend(config_item, {metric: metric}) 
+  config = for monitor, config_item of config
+    us.extend(config_item, {monitor: monitor}) 
   cb(null, config)
 
 
-exports.remote = remote= (host, port, licenceKey, cb) ->
+exports.remote = remote = (options, cb) ->
   util.rest(
     {
-      host: host 
-      port: port
+      host: options.host 
+      port: options.port
       method: 'GET'
       path: /monitor/+os.hostname()
       headers : {
-        'licenseKey' : licenceKey
-      }    
+        'licenseKey' : options.licence_key
+      }
     }
   , (err, status, result) ->
       if err
-        return cb(VError(err, "failed to call remote service grab montior list"))       
+        console.log err
+        return cb(new VError(err, "failed to call remote service grab montior list"))       
       if status != 200
         return cb(new Error("call /montor return error status #{status}"))
       cb(null, result)
   )
 
+exports.json = json = (local_path, callback) ->
+  fs.readFile(local_path, {encoding: 'utf8'}, (err, data) ->
+    if err
+      return callback(err)
+    try
+      config = JSON.parse(data)
+    catch e
+      return callback(new Error("wrong json format of #{local_path}"))
+    callback(null, config) 
+  )
 
 
-exports.remote_backup = (host, port, backup_path, callback) ->
-  remote(host, port, (err, config) ->
-    if not err 
+exports.backup = backup = (configer, backup_path, callback) ->
+  configer (err, config) ->
+    if err
+      json(backup_path, callback)
+    else
       fs.writeFile(backup_path, JSON.stringify(config), (err) ->
         if err
           callback(Verror(e, "failed to backup config to local #{backup_path}"))      
         else
           callback(null, config)
-      )  
-    else
-      callback(err)
-  )
+      )
+
+exports.merge = merge = ( args... ) ->
+  callback = args[args.length - 1] 
+  if args.length < 3
+    return callback(new Error('wrong argument pass to merge function, at less three input'))  
+  
+  async.reduce(
+    args[..-2]
+  , []
+  , (memo, configer, callback) ->
+      configer (err, config) ->
+        if err
+          callback(err)
+        else
+          callback(err, memo.concat(config))      
+  , callback)
+

@@ -32,31 +32,37 @@ util = require './lib/util'
 #   console.log result 
 # )
 
-os = require 'os'
-VError = require('verror');
+# os = require 'os'
+# VError = require('verror');
+# config = require './lib/config'
 
-util.rest(
-  {
+# config.remote({host:'localhost', port:9090, licence_key: 'lzyJanDTLW4yQ4nNKd3t'},
+#   (err, config) ->
+#     console.log err
+#     console.log config
+# )
+
+config = require './lib/config'
+
+c1 = (callback) ->
+  config.remote({
     host: 'localhost'
     port: 9090
-    method: 'GET'
-    path: /monitor/+os.hostname()
-    headers : {
-      'licenseKey' : 'lzyJanDTLW4yQ4nNKd3t'
-    }    
-  }
-, (err, status, result) ->
-    console.log "----------"
-    console.log err
-    console.log status
-    console.log result
-    # if err
-    #   return cb(VError(err, "failed to call remote service grab montior list"))       
-    # if status != 200
-    #   return cb(new Error("call /montor return error status #{status}"))
-    # try
-    #   config = JSON.parse(result)
-    # catch e
-    #   return cb(new VError(e, "wrong json format remote return"))
-    # cb(null, config)
+    licence_key: 'lzyJanDTLW4yQ4nNKd3t'
+    }, callback)
+
+c2 = (callback) ->
+  config.local('./conf/test', callback)
+
+
+config.merge(c1, c2, (err, config) ->
+  console.log err
+  console.log config
 )
+
+
+# t = (args...) ->
+#   console.log args
+
+# t(1,2,3,4)
+  

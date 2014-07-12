@@ -20,6 +20,27 @@ default_options = {
   buffer_flush : 3
 }
 
+remote_config = (callback) ->
+  config.remote({
+    host: agentconfig.remote_host, 
+    port: agentconfig.remote_port, 
+    licence_key: agentconfig.license_key
+    }, callback)
+
+remote_backup_config = (callback) ->
+  config.backup(
+    remote_config,
+    agentconfig.monitor_local_backup, 
+    callback)
+
+local_config = (callback) ->
+  config.local('/Users/mingqi/monitorat/ma-agent/conf/test/a.conf', callback)
+
+
+# monitor_configer = (callback) ->
+#   config.merge(local_config, remote_backup_config, callback)
+
+
 tsd_upload = upload(us.extend(default_options, agentconfig, {uri: '/tsd'}))
 host_upload = upload(us.extend(default_options, agentconfig, {
   uri: '/host'
@@ -31,9 +52,7 @@ report_upload = upload(us.extend(default_options, agentconfig, {
   buffer_flush: 1}))
 
 agent = Agent(
-  ((cb) -> 
-    config.remote(agentconfig.remote_host, agentconfig.remote_port, agentconfig.license_key, cb)
-  ), 
+  remote_backup_config,
   [host({interval: agentconfig.agent_report_interval})], 
   [
     ['tsd', tsd_upload],
@@ -44,6 +63,5 @@ agent = Agent(
     ['report', stdout()]
   ]
 )
-
 
 agent.start()

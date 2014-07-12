@@ -1,11 +1,11 @@
 module.exports = (config) ->
   interval_obj = null
   count = 0
-  metric = config.metric
+  monitor = config.monitor
   query = (emit) ->
       emit({
         tag: config.tag
-        record: { metric: metric, value: count+=1 }
+        record: { metric: monitor, value: count+=1 }
         })
 
   return {
