@@ -1,4 +1,4 @@
-Tail = require('../tail').Tail
+Tail = require('tail-forever').Tail
 xregexp = require('xregexp').XRegExp
 glob = require 'glob'
 path = require 'path'

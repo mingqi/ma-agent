@@ -18,7 +18,7 @@ present = (config, properties) ->
     assert.ok(config[p], "#{p} is required for sql plugin")
 
 module.exports = (config) ->
-  present(config, ['monitor', 'host', 'port', 'user', 'pwd', 'database', 'query'])
+  present(config, ['monitor', 'host', 'port', 'query'])
   port = parseInt(config.port)
   assert.ok(port, "port must be a number: #{config.port}")
   assert.ok(parseInt(config.interval), "interval must be number: #{config.interval}") if config.interval

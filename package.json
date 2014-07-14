@@ -15,7 +15,8 @@
     "winston": "*",
     "xregexp": "*",
     "MD5" : "*",
-    "dirty" : "*"
+    "dirty" : "*",
+    "tail-forever" : "*"
   },
   "devDependencies" : {
     "sleep" : "*",
