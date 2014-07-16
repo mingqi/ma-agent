@@ -38,7 +38,7 @@ exports.remote = remote = (options, cb) ->
       method: 'GET'
       path: /monitor/+os.hostname()
       headers : {
-        'licenseKey' : options.licence_key
+        'licenseKey' : options.license_key
       }
     }
   , (err, status, result) ->

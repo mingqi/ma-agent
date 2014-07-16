@@ -1,7 +1,6 @@
 mysql = require 'mysql'
 assert = require 'assert'
 report = require '../report'
-console.log report
 
 ###
   monitor

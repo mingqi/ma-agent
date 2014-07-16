@@ -1,68 +1,54 @@
-# mysql = require('mysql');
+# supervisor = require './lib/supervisor'
 
-# conn = mysql.createConnection({
-#   host : 'dev.monitorat.com'
-#   port: 3306,
-#   user: 'ma_readonly',
-#   password: 'mmma_readonlyonly'
+# sup = supervisor.Supervisor(require.resolve('./lib/worker'), 3)
+# sup.run()
+
+# Daemonize = require './lib/daemonize'
+
+# d = Daemonize({
+#   script: require.resolve('./test')
+#   outFile: '/var/tmp/tt/tt.out'
+#   errFile: '/var/tmp/tt/tt.err'
+#   pidFile : '/var/tmp/tt/tt.pid'#   detached: true
+#   stopTimeout: 3
 #   })
 
-# conn.query('select count(*faf) from tsclogdb.detail_weblogs where add_date > now() - interval 5 minute', (err, rows,fields) ->
-#   if rows? and rows.length > 0
-#     value = rows[0][fields[0].name]
-#     console.log value
-#   conn.destroy()
+# action = process.argv[2]
+# switch action
+#   when "start"
+#     d.start()
+#   when "stop"
+#     d.stop((err) ->
+#       console.log "success stop"    
+#     )
+
+#   when "restart"
+#     d.restart()
+
+# spawn = require('child_process').spawn
+
+# child = spawn(process.execPath, ['./test.js'], {detached: true, stdio: ['ignore',out, err]}) 
+# console.log child.pid
+# console.log "aaaaaaaa"
+
+
+# setTimeout(() ->
+#   child.unref()
+# , 3000
 # )
 
 util = require './lib/util'
 
-# util.rest(
-#   {
-#     host: 'localhost'
-#     port: 9090
-#     method: 'GET'
-#     path: '/monitor/mingqi-mac'
-#     headers : {
-#       'licenseKey' : 'lzyJanDTLW4yQ4nNKd3t'
-#     }  
-#   }
-# , (err, status, result) ->
-#   console.log err
-#   console.log status
-#   console.log result 
-# )
-
-# os = require 'os'
-# VError = require('verror');
-# config = require './lib/config'
-
-# config.remote({host:'localhost', port:9090, licence_key: 'lzyJanDTLW4yQ4nNKd3t'},
-#   (err, config) ->
-#     console.log err
-#     console.log config
-# )
-
-config = require './lib/config'
-
-c1 = (callback) ->
-  config.remote({
-    host: 'localhost'
-    port: 9090
-    licence_key: 'lzyJanDTLW4yQ4nNKd3t'
-    }, callback)
-
-c2 = (callback) ->
-  config.local('./conf/test', callback)
-
-
-config.merge(c1, c2, (err, config) ->
-  console.log err
-  console.log config
+hasFile = false
+setTimeout(() ->
+  hasFile = true
+, 2000
 )
 
 
-# t = (args...) ->
-#   console.log args
-
-# t(1,2,3,4)
-  
+util.wait(100, 3000, () ->
+  hasFile
+, (err, done) ->
+  console.log "aaaaaaa"
+  console.log done
+)

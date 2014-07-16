@@ -16,7 +16,9 @@
     "xregexp": "*",
     "MD5" : "*",
     "dirty" : "*",
-    "tail-forever" : "*"
+    "tail-forever" : "*",
+    "is-running" : "*",
+    "commander" : "*"
   },
   "devDependencies" : {
     "sleep" : "*",

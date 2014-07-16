@@ -2,3 +2,6 @@ var
 node_modules/
 test.*
 .DS_Store
+_lib/
+_npm
+_tar

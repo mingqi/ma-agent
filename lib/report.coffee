@@ -17,4 +17,4 @@ PluginReport = (emit, monitorId) ->
           message: message}
         }) 
      
-exports.PluginReport = PluginReport   
+exports.PluginReport = PluginReport
