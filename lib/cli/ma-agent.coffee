@@ -9,7 +9,7 @@ upload = require '../plugin/out_upload'
 host = require '../plugin/in_host'
 program = require 'commander'
 path = require 'path'
-Supervisor = require '../supervisor'
+supervisor = require '../supervisor'
 version = require '../version'
 
 run = () -> 
@@ -76,8 +76,12 @@ run = () ->
 supervisord = () ->
   script = process.argv[1]
   args = process.argv[2..]
-  sup = Supervisor(script, args, 3000)
-  sup.run()
+  sup = supervisor.Supervisor(script, args, 3000)
+  sup.run((err) ->
+    if err
+      console.log "failed to start ma-agent: #{err.message}"   
+      process.exit(1)
+  )
 
 
 program
@@ -85,11 +89,10 @@ program
   .option('-r, --root [path]', 'application root directory')
   .option('-c, --config [path]', 'config file')
   .option('-s, --supervisord', 'use supervisord mode')
-  .option('-p, --pidFile [path]', 'pid file path')
-  .option('-l, --logfile [logfile]', 'pid file path')
   .parse(process.argv)
   
 if program.supervisord and not process.env.__supervisor_child
   supervisord()
 else
   run()
+  supervisor.checkHeartbeat(3000)

@@ -29,7 +29,9 @@ module.exports  = (options) ->
     if not fs.existsSync(pidFile) 
       return null
     try
-      return fs.readFileSync(pidFile)
+      pid = fs.readFileSync(pidFile)
+      if pid
+        return parseInt(pid)
     catch e
       return null
 
@@ -39,15 +41,13 @@ module.exports  = (options) ->
   return {
 
     start : (callback) ->
-      if process.env.__daemon
-        return process.pid;
+      pid = readPid()
+      if pid and running(pid)
+        return callback()
 
       opt = opt || {};
       env = opt.env || process.env;
 
-      # the child process will have this set so we can identify it as being daemonized
-      env.__daemon = true;
- 
       out = if outFile then fs.openSync(outFile, 'a') else 'ignore';
       err = if errFile then fs.openSync(errFile, 'a') else 'ignore';
       cp_opt = {
@@ -76,8 +76,7 @@ module.exports  = (options) ->
       )
 
     stop : (callback) ->
-      pid = readPid(pidFile)
-      pid = parseInt(pid) if pid
+      pid = readPid()
       if pid and running(pid)
         util.kill(pid, stopTimeout, (err) ->
           if not err

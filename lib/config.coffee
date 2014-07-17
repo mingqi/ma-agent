@@ -69,7 +69,7 @@ exports.backup = backup = (configer, backup_path, callback) ->
     else
       fs.writeFile(backup_path, JSON.stringify(config), (err) ->
         if err
-          callback(Verror(e, "failed to backup config to local #{backup_path}"))      
+          callback(new VError(err, "failed to backup config to local #{backup_path}"))      
         else
           callback(null, config)
       )

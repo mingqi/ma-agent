@@ -1,21 +1,17 @@
 all: 
 	echo "please give task name: npm, rpm... etc"
 
-init:
-	mkdir ./_npm
+_build:
+	mkdir _build
+	mkdir -p _build/npm/lib
+	mkdir _build/rpm
 
-npm: _npm copy_files compile_coffee
+npm: _build compile_coffee
+	cp index.js ./_build/npm
+	cp ./package.json ./_build/npm
 
 compile_coffee:
-	coffee -c -o _npm/lib ./lib
-
-_npm:
-	mkdir _npm
-
-copy_files:
-	cp index.js ./_npm
-	cp ./package.json ./_npm
-
+	coffee -c -o _build/npm/lib ./lib
 
 linux64: _tar  npm
 	tar -xvf node/node-v0.10.29-linux-x64.tar.gz -C _tar

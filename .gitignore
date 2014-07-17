@@ -5,3 +5,4 @@ test.*
 _lib/
 _npm
 _tar
+_build
