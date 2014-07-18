@@ -21,7 +21,7 @@
 
 name="ma-agent"
 prog="ma-agent"
-ma_agent=/usr/local/ma-agent/bin/ma-agent
+ma_agent=/opt/ma-agent/bin/ma-agent
 
 # timeout can be overridden from /etc/sysconfig/td-agent
 STOPTIMEOUT=60

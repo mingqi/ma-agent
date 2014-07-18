@@ -14,7 +14,7 @@ version = require '../version'
 
 run = () -> 
   config_file = program.config or '/etc/ma-agent/ma-agent.conf'
-  root = program.root or '/usr/local/ma-agent/'
+  root = program.root or '/opt/ma-agent/'
   options = hoconfig(config_file)
 
   remote_config = (callback) ->
