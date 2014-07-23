@@ -6,3 +6,6 @@ _lib/
 _npm
 _tar
 _build
+/_class
+.classpath
+.project

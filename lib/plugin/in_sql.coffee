@@ -4,6 +4,8 @@ mssql = require 'mssql'
 pg = require 'pg'
 assert = require 'assert'
 report = require '../report'
+spawn = require('child_process').spawn
+
 
 ###
   monitor
@@ -12,12 +14,57 @@ report = require '../report'
   port
   user
   pwd
+  sid // this is only for Oracle
   database
   query
 ###
 
 ERR_ROWS = "query return more then one row"
 ERR_COLUMNS = "there are more than one field in query's select"
+
+_oracle = (config, callback) ->
+  cp_opt = {
+    detached: false
+    env : process.env
+    cwd : process.cwd     
+    stdio: 'pipe'
+    # stdio: 'inherit'
+  }
+  args = [
+    "-cp", "./jar/ojdbc7.jar:./_class"
+    "com.monitorat.agent.SQLQuery"
+    "--host", config.host
+    "--port", config.port
+    "--user", config.user
+    "--password", config.pwd
+    "--database", config.database
+    "--sid", config.sid
+    "--query", config.query
+  ]
+
+  child_output = ""
+  child = spawn('java', args, cp_opt)
+  child.stdout.setEncoding('utf8')
+  child.stdout.on 'data', (data) ->
+    child_output += data
+  
+  child.on 'exit', (code) ->
+    console.log "child exit with #{code}"
+    console.log "child output: #{child_output}"
+    switch code
+      when 1    # no value
+        return callback() 
+      when 2    # column more than 1
+        return callback(new Error(ERR_COLUMNS))
+      when 3    # row more than 1
+        return callback(new Error(ERR_ROWS))
+      when 0
+        return callback(null, child_output.trim()) 
+      else
+        if child_output.indexOf('ORA-01435') >=0
+          return callback(new Error("database #{config.database} doesn't exists"))       
+        return callback(new Error(child_output.trim()))
+    
 
 _mssql = (config, callback) ->
   conn_config =
@@ -116,6 +163,7 @@ DATABASE_MAPPING =
   'mysql' : _mysql
   'postgresql' : _pg
   'mssql' : _mssql
+  'oracle': _oracle
 
 
 present = (config, properties) ->
