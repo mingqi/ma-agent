@@ -52,7 +52,7 @@ report_upload = upload(us.extend(default_options, agentconfig, {
   buffer_flush: 1}))
 
 agent = Agent(
-  remote_backup_config,
+  local_config,
   [host({interval: agentconfig.agent_report_interval})], 
   [
     ['tsd', tsd_upload],
