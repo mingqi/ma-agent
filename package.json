@@ -18,7 +18,9 @@
     "dirty" : "*",
     "tail-forever" : "*",
     "is-running" : "*",
-    "commander" : "*"
+    "commander" : "*",
+    "pg" : "*",
+    "mssql" : "*"
   },
   "devDependencies" : {
     "sleep" : "*",

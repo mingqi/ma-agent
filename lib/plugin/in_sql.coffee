@@ -1,4 +1,6 @@
+us = require 'underscore'
 mysql = require 'mysql'
+mssql = require 'mssql'
 pg = require 'pg'
 assert = require 'assert'
 report = require '../report'
@@ -14,6 +16,45 @@ report = require '../report'
   query
 ###
 
+ERR_ROWS = "query return more then one row"
+ERR_COLUMNS = "there are more than one field in query's select"
+
+_mssql = (config, callback) ->
+  conn_config =
+    server: config.host
+    port: parseInt(config.port)
+    user: config.user
+    password: config.pwd
+    database: config.database
+
+  conn = new mssql.Connection conn_config, (err) ->
+    if err 
+      return callback err
+
+    req = new mssql.Request(conn)
+
+    req.query config.query, (err, result) ->
+      console.log config.query
+      try
+        if err
+          return callback err
+
+        console.log result
+        if not result? or result.length < 1
+          return callback()
+
+        if result.length > 1
+          return callback(new Error(ERR_ROWS))
+
+        columns = us.keys result.columns
+        if columns.length > 1
+          return callback(new Error(ERR_COLUMNS))
+
+        value = result[0][columns[0]]
+        callback(null, value)
+      finally
+        conn.close()
+  
 _mysql = (config, callback) ->
   conn = mysql.createConnection({
     host : config.host,
@@ -71,10 +112,10 @@ _pg = (config, callback) ->
         client.end()
       
 
-
 DATABASE_MAPPING = 
   'mysql' : _mysql
-  'pg' : _pg
+  'postgresql' : _pg
+  'mssql' : _mssql
 
 
 present = (config, properties) ->
@@ -95,10 +136,13 @@ module.exports = (config) ->
       if err
         return _report('problem', err.message)
 
+      intValue = parseInt(value) 
+      if isNaN(intValue)
+        return _report('problem', "query's result '#{value}' is not a number")
       _report('ok')
       emit({
         tag: 'tsd'
-        record: {metric: config.monitor, value: value}
+        record: {metric: config.monitor, value: intValue}
       })
     )
 
