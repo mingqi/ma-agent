@@ -3,6 +3,10 @@ zlib = require 'zlib'
 us = require 'underscore'
 async = require 'async'  
 running = require('is-running')
+spawn = require('child_process').spawn
+fs = require 'fs'
+path = require 'path'
+
 
 exports.systemTime = systemTime = () ->
   (new Date()).getTime()
@@ -38,6 +42,30 @@ exports.kill = kill = (pid, timeout, callback) ->
       callback() 
   )       
 
+exports.shell = shell = (command, args, options, callback) ->
+  us.extend(args, {stdio: 'pipe'})
+  child = spawn(command, args, options)
+
+  child_output = ""
+  child.stdout.setEncoding('utf8')
+  child.stdout.on 'data', (data) ->
+    child_output += data
+
+  child.on 'exit', (code) ->
+    callback(null, code, child_output)
+
+exports.findPath = findPath = (base_dir, p) ->
+  while(true)
+    pp = path.join(base_dir, p)
+    if fs.existsSync pp
+      return pp 
+
+    break if base_dir == '/'
+    base_dir = path.dirname(base_dir)
+
+  return null
+
+   
 
 exports.rest = (options, body, callback) ->
   if not callback

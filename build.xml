@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<project name="core" default="all">
+	<target name="all" description="Build everything" depends="jar" />
+
+	<target name="init" description="Create temporary directories and setup properties" depends="">
+		<mkdir dir="_build/classes" />
+		<path id="classpath">
+			<fileset dir="jar" includes="**/*.jar" />
+			
+		</path>
+	</target>
+
+	<target name="compile" description="Compile sources" depends="init">
+		<javac srcdir="src/java" destdir="_build/classes" classpathref="classpath" debug="on" memorymaximumsize="200m" fork="true" includeantruntime="false" encoding="UTF-8"/>
+	</target>
+
+	<target name="jar" description="Jar up our class files" depends="compile">
+		<jar destfile="_build/ma-agent.jar" basedir="_build/classes" />
+	</target>
+
+
+	<target name="clean" description="Clean up intermediate files">
+		<delete dir="_build" quiet="true" />
+		<delete file="lib/ma-agent.jar" />
+	</target>
+</project>

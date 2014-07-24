@@ -2,7 +2,6 @@ VERSION=1.0.0
 ROOT=_build/ma-agent-${VERSION}
 OPT_ROOT=${ROOT}/opt/ma-agent
 
-
 all: 
 	echo "please give task name: npm, rpm... etc"
 
@@ -25,21 +24,38 @@ npm: _build compile_coffee
 compile_coffee:
 	coffee -c -o _build/npm/lib ./lib
 
-rpm: _build  npm
+build/ma-agent.jar: 
+	ant
+
+
+rpm: _build npm build/ma-agent.jar
 	## node
 	tar -xf node/node-v0.10.29-linux-x64.tar.gz -C _build/
 	mv _build/node-v0.10.29-linux-x64 ${OPT_ROOT}/node
-	mkdir -p ${OPT_ROOT}/
+	chmod -R 644 ${OPT_ROOT}/node/
+	chmod 755 ${OPT_ROOT}/node/bin/node
+
+	## jre
+	tar -xf jre/jre-7u65-linux-x64.gz -C _build
+	mv _build/jre1.7.0_65 ${OPT_ROOT}/jre
+	chmod -R 644 ${OPT_ROOT}/jre/
+	chmod 755 ${OPT_ROOT}/jre/bin/java
+
+	## jar
+	mkdir -p ${OPT_ROOT}/lib
+	cp _build/ma-agent.jar ${OPT_ROOT}/jar
 
 	## ma-agent npm
 	rm -rf /tmp/npm /tmp/node_modules
 	cp -r _build/npm /tmp/npm
-	cd /tmp && npm install  ./npm
-
+	cd /tmp && cnpm install  ./npm
 	mv /tmp/node_modules ${OPT_ROOT}/
+	chmod -R 644 ${OPT_ROOT}/node_modules
 
-	# var
+
+	# bin var
 	cp -r bin ${OPT_ROOT}
+	chmod -R 755 ${OPT_ROOT}/bin
 	mkdir ${OPT_ROOT}/var
 
 	# etc
@@ -56,13 +72,8 @@ rpm: _build  npm
 	mv _build/ma-agent-${VERSION}.tar.gz _build/rpmbuild/SOURCES
 	cp redhat/ma-agent.spec _build/rpmbuild/SPECS
 
-	rpmbuild -ba _build/rpmbuild/SPECS/ma-agent.spec
+	rpmbuild -ba -vv _build/rpmbuild/SPECS/ma-agent.spec
 
-	# npm install ./_npm
-
-	# mkdir -p ./_tar/node_modules
-	# cp -r node_modules/ma-agent ./_tar/node_modules/ma-agent
-	# mkdir -p ./_tar/var
 
 mac64: _tar npm
 	tar -xvf node/node-v0.10.29-darwin-x64.tar.gz -C _tar

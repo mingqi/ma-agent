@@ -4,7 +4,8 @@ mssql = require 'mssql'
 pg = require 'pg'
 assert = require 'assert'
 report = require '../report'
-spawn = require('child_process').spawn
+shell = require('../util').shell
+util = require '../util'
 
 
 ###
@@ -42,21 +43,17 @@ _oracle = (config, callback) ->
     "--query", config.query
   ]
 
-  child_output = ""
-  child = spawn('java', args, cp_opt)
-  child.stdout.setEncoding('utf8')
-  child.stdout.on 'data', (data) ->
-    child_output += data
-  
-  child.on 'exit', (code) ->
-    console.log "child exit with #{code}"
-    console.log "child output: #{child_output}"
+  java_path = util.findPath __dirname, 'bin/java'
+  if not java_path
+    java_path = 'java'
+
+  shell java_path, args, cp_opt, (err, code, child_output) ->
     switch code
-      when 1    # no value
+      when 11    # no value
         return callback() 
-      when 2    # column more than 1
+      when 12    # column more than 1
         return callback(new Error(ERR_COLUMNS))
-      when 3    # row more than 1
+      when 13    # row more than 1
         return callback(new Error(ERR_ROWS))
       when 0
         return callback(null, child_output.trim()) 
@@ -86,7 +83,6 @@ _mssql = (config, callback) ->
         if err
           return callback err
 
-        console.log result
         if not result? or result.length < 1
           return callback()
 

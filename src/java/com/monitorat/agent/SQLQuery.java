@@ -78,7 +78,7 @@ public class SQLQuery {
 				exitCode = 11;
 				return;
 			}
-			
+
 			if(meta.getColumnCount() > 1){
 				exitCode = 12;
 				return;
@@ -98,8 +98,8 @@ public class SQLQuery {
 				stmt.close();
 			}
 			connection.close();
+			System.exit(exitCode);
 		}
 		
-		System.exit(exitCode);
 	}
 }

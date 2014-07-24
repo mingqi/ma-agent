@@ -16,11 +16,11 @@ SOURCE0: %{name}-%{version}.tar.gz
 #Source1: %{name}.init
 BuildRoot: /var/tmp/ma-agent/rpmbuild/BUILDROOT
 
-Requires: /sbin/chkconfig
-Requires(post): /sbin/chkconfig
-Requires(post): /sbin/service
-Requires(preun): /sbin/chkconfig
-Requires(preun): /sbin/service
+#Requires: /sbin/chkconfig
+#Requires(post): /sbin/chkconfig
+#Requires(post): /sbin/service
+#Requires(preun): /sbin/chkconfig
+#Requires(preun): /sbin/service
 
 %description
 %{summary}
@@ -43,7 +43,7 @@ cp -a * %{buildroot}
 rm -rf %{buildroot}
 
 %post
-echo "Configure td-agent to start, when booting up the OS..."
+echo "Configure ma-agent to start, when booting up the OS..."
 /sbin/chkconfig --add ma-agent
 
 %preun
@@ -57,6 +57,3 @@ echo "Stopping ma-agent ..."
 /etc/init.d/ma-agent
 /opt/ma-agent/*
 
-#%changelog
-#* Thu Apr 24 2009  Elia Pinto <devzero2000@rpm5.org> 1.0-1
-#- First Build#
