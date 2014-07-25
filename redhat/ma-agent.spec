@@ -16,11 +16,11 @@ SOURCE0: %{name}-%{version}.tar.gz
 #Source1: %{name}.init
 BuildRoot: /var/tmp/ma-agent/rpmbuild/BUILDROOT
 
-#Requires: /sbin/chkconfig
-#Requires(post): /sbin/chkconfig
-#Requires(post): /sbin/service
-#Requires(preun): /sbin/chkconfig
-#Requires(preun): /sbin/service
+Requires: /sbin/chkconfig
+Requires(post): /sbin/chkconfig
+Requires(post): /sbin/service
+Requires(preun): /sbin/chkconfig
+Requires(preun): /sbin/service
 
 %description
 %{summary}
@@ -53,7 +53,7 @@ echo "Stopping ma-agent ..."
 
 %files
 %defattr(-,root,root,-)
-/etc/ma-agent/ma-agent.conf
+/etc/ma-agent/*
 /etc/init.d/ma-agent
 /opt/ma-agent/*
 

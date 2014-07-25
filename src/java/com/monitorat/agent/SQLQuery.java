@@ -60,8 +60,11 @@ public class SQLQuery {
 		Connection connection = null;
 		Statement stmt = null;
 		try {
+			DriverManager.setLoginTimeout(3);
+			System.out.println("connectting...");
 			connection = DriverManager.getConnection("jdbc:oracle:thin:@"
 					+ host + ":" + port + ":" + sid, user, password);
+			System.out.println("connected!");
 			connection.createStatement().execute("alter session set current_schema="+database);
 			
 			stmt = connection.createStatement();
@@ -94,10 +97,12 @@ public class SQLQuery {
 			System.out.println(e.getMessage());
 			exitCode = 255;
 		}finally{
-			if(stmt !=null){
+			if(stmt !=null && !stmt.isClosed()){
 				stmt.close();
 			}
-			connection.close();
+			if(connection != null && !connection.isClosed()){
+				connection.close();
+			}
 			System.exit(exitCode);
 		}
 		

@@ -40,7 +40,8 @@ exports.kill = kill = (pid, timeout, callback) ->
       if not not_running    
         process.kill(pid, "SIGKILL")
       callback() 
-  )       
+  ) 
+
 
 exports.shell = shell = (command, args, options, callback) ->
   us.extend(args, {stdio: 'pipe'})
@@ -48,11 +49,35 @@ exports.shell = shell = (command, args, options, callback) ->
 
   child_output = ""
   child.stdout.setEncoding('utf8')
+  child.stderr.setEncoding('utf8')
   child.stdout.on 'data', (data) ->
     child_output += data
+  child.stderr.on 'data', (data) ->
+    child_output += data
 
+  is_timeout = false
   child.on 'exit', (code) ->
-    callback(null, code, child_output)
+    if not is_timeout
+      return callback(null, code, child_output)
+    else
+      return callback(new Error("shell execute over timeout #{timeout}"))
+
+  child_pid = child.pid
+
+  timeout = options.timeout || 3000
+  kill_timeout = options.kill_timeout || 3000
+  wait 100, timeout
+  , () ->
+    not running(child.pid)
+  , (err, not_running) ->
+    if not not_running
+      is_timeout = true
+      kill child.pid, kill_timeout, () ->
+        console.log "child shell #{child_pid} was killed because over timeout #{timeout}" 
+      
+  
+  
+  
 
 exports.findPath = findPath = (base_dir, p) ->
   while(true)

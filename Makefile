@@ -22,13 +22,12 @@ npm: _build compile_coffee
 	cp ./package.json ./_build/npm
 
 compile_coffee:
-	coffee -c -o _build/npm/lib ./lib
+	coffee -c -o _build/npm/lib ./src/node
 
-build/ma-agent.jar: 
+_build/ma-agent.jar: 
 	ant
 
-
-rpm: _build npm build/ma-agent.jar
+rpm: _build npm _build/ma-agent.jar
 	## node
 	tar -xf node/node-v0.10.29-linux-x64.tar.gz -C _build/
 	mv _build/node-v0.10.29-linux-x64 ${OPT_ROOT}/node
@@ -43,7 +42,8 @@ rpm: _build npm build/ma-agent.jar
 
 	## jar
 	mkdir -p ${OPT_ROOT}/lib
-	cp _build/ma-agent.jar ${OPT_ROOT}/jar
+	cp _build/ma-agent.jar ${OPT_ROOT}/lib
+	cp lib/*.jar ${OPT_ROOT}/lib
 
 	## ma-agent npm
 	rm -rf /tmp/npm /tmp/node_modules
@@ -60,6 +60,7 @@ rpm: _build npm build/ma-agent.jar
 
 	# etc
 	mkdir -p ${ROOT}/etc/ma-agent
+	mkdir -p ${ROOT}/etc/ma-agent/monitor.d
 	cp conf/dev.conf ${ROOT}/etc/ma-agent/ma-agent.conf
 
 	## init.d
@@ -72,18 +73,25 @@ rpm: _build npm build/ma-agent.jar
 	mv _build/ma-agent-${VERSION}.tar.gz _build/rpmbuild/SOURCES
 	cp redhat/ma-agent.spec _build/rpmbuild/SPECS
 
-	rpmbuild -ba -vv _build/rpmbuild/SPECS/ma-agent.spec
+	rpmbuild -ba _build/rpmbuild/SPECS/ma-agent.spec
 
+install: rpm
+	sudo rpm -ihv _build/rpmbuild/RPMS/x86_64/ma-agent-${VERSION}-0.el6.x86_64.rpm
 
-mac64: _tar npm
-	tar -xvf node/node-v0.10.29-darwin-x64.tar.gz -C _tar
-	mv _tar/node-v0.10.29-darwin-x64 _tar/node
-
-	npm install ./_npm
-	mkdir -p ./_tar/node_modules
-	cp -r node_modules/ma-agent ./_tar/node_modules/ma-agent
-	mkdir -p ./_tar/var
+rsync_dev:
+	rsync -avz ./_build/rpmbuild/RPMS/x86_64/ma-agent-1.0.0-0.el6.x86_64.rpm  mingqi@dev.monitorat.com:/var/tmp/
 
 clean:
 	rm -rf ./_build
 
+linstall: _build/ma-agent.jar lib npm luninstall
+	cp bin/* /opt/ma-agent/bin/	
+	cp _build/ma-agent.jar /opt/ma-agent/lib
+	cp lib/*.jar /opt/ma-agent/lib
+	cp -r _build/npm/lib/ /opt/ma-agent/node_modules/ma-agent/lib
+	cp -r node_modules/ /opt/ma-agent/node_modules/ma-agent/node_modules
+
+luninstall:
+	rm -rf /opt/ma-agent/bin/*
+	rm -rf /opt/ma-agent/lib/*
+	rm -rf /opt/ma-agent/node_modules/ma-agent/*

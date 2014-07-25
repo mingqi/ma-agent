@@ -30,6 +30,12 @@ run = () ->
       path.join(root, 'var/remote_backup_config.json')
       callback)
 
+  local = (callback) ->
+    config.local('/etc/ma-agent/monitor.d', callback)
+
+  merged_config = (callback) ->
+    config.merge(remote_backup_config, local, callback)
+    
 
   tsd_upload = upload({
     remote_host : options.remote_host
@@ -59,7 +65,7 @@ run = () ->
     })
 
   agent = Agent(
-    remote_backup_config,
+    merged_config,
     [host({interval: 10})], 
     [
       ['tsd', tsd_upload],

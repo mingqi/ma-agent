@@ -6,7 +6,8 @@ assert = require 'assert'
 report = require '../report'
 shell = require('../util').shell
 util = require '../util'
-
+path = require 'path'
+glob = require 'glob'
 
 ###
   monitor
@@ -29,10 +30,18 @@ _oracle = (config, callback) ->
     env : process.env
     cwd : process.cwd     
     stdio: 'pipe'
+    timeout : 5000
     # stdio: 'inherit'
   }
+
+  jar_path = util.findPath( __dirname, 'lib/ma-agent.jar')
+  console.log "jar_path=#{jar_path}"
+  return callback(new Error("can't find out ma-agent.jar")) if not jar_path  
+  jar_path = path.dirname(jar_path)
+  cp = glob.sync("#{jar_path}/*.jar").join(':')
+   
   args = [
-    "-cp", "./jar/ojdbc7.jar:./_class"
+    "-cp", cp
     "com.monitorat.agent.SQLQuery"
     "--host", config.host
     "--port", config.port
@@ -43,11 +52,15 @@ _oracle = (config, callback) ->
     "--query", config.query
   ]
 
-  java_path = util.findPath __dirname, 'bin/java'
+  java_path = util.findPath __dirname, 'jre/bin/java'
   if not java_path
     java_path = 'java'
 
   shell java_path, args, cp_opt, (err, code, child_output) ->
+    if err
+      return console.log err 
+    console.log "child exit with #{code}"
+    console.log child_output
     switch code
       when 11    # no value
         return callback() 

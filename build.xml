@@ -5,7 +5,7 @@
 	<target name="init" description="Create temporary directories and setup properties" depends="">
 		<mkdir dir="_build/classes" />
 		<path id="classpath">
-			<fileset dir="jar" includes="**/*.jar" />
+			<fileset dir="lib" includes="**/*.jar" />
 			
 		</path>
 	</target>
