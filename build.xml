@@ -16,6 +16,7 @@
 
 	<target name="jar" description="Jar up our class files" depends="compile">
 		<jar destfile="_build/ma-agent.jar" basedir="_build/classes" />
+		<copy file="_build/ma-agent.jar" todir="lib" />
 	</target>
 
 

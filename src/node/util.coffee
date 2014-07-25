@@ -43,9 +43,12 @@ exports.kill = kill = (pid, timeout, callback) ->
   ) 
 
 
-exports.shell = shell = (command, args, options, callback) ->
+exports.shell = shell = (command, args, input, options, callback) ->
   us.extend(args, {stdio: 'pipe'})
   child = spawn(command, args, options)
+
+  if input
+    child.stdin.end(input)
 
   child_output = ""
   child.stdout.setEncoding('utf8')

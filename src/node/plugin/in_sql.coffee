@@ -46,7 +46,6 @@ _oracle = (config, callback) ->
     "--host", config.host
     "--port", config.port
     "--user", config.user
-    "--password", config.pwd
     "--database", config.database
     "--sid", config.sid
     "--query", config.query
@@ -56,7 +55,11 @@ _oracle = (config, callback) ->
   if not java_path
     java_path = 'java'
 
-  shell java_path, args, cp_opt, (err, code, child_output) ->
+  shell_input = """
+    password: #{config.pwd}
+    afaf
+  """
+  shell java_path, args, shell_input, cp_opt, (err, code, child_output) ->
     if err
       return console.log err 
     console.log "child exit with #{code}"

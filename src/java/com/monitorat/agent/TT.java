@@ -3,15 +3,9 @@ package com.monitorat.agent;
 public class TT {
 
 	public static void main(String[] args) {
-		try{
-			System.out.println("aaaa");
-			if(true){
-				return;
-			}
-			System.out.println("bbbb");
-		}finally{
-			System.out.println("DONE");
-		}
+		String a = "password: thisis password: faf";
+		String s = a.split(":", 2)[1];
+		System.out.println(s);
 	}
 
 }

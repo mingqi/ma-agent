@@ -1,5 +1,8 @@
 package com.monitorat.agent;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -54,6 +57,20 @@ public class SQLQuery {
 			}
 			curr++;
 		}
+		
+		try{
+			BufferedReader br = 
+	                      new BufferedReader(new InputStreamReader(System.in));
+			String input;
+			while((input=br.readLine())!=null){
+				if(input.startsWith("password:")){
+					password = input.split(":", 2)[1].trim();
+				}
+			}
+	 
+		}catch(IOException io){
+			io.printStackTrace();
+		}
 
 		int exitCode = 0;
 		Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -61,10 +78,8 @@ public class SQLQuery {
 		Statement stmt = null;
 		try {
 			DriverManager.setLoginTimeout(3);
-			System.out.println("connectting...");
 			connection = DriverManager.getConnection("jdbc:oracle:thin:@"
 					+ host + ":" + port + ":" + sid, user, password);
-			System.out.println("connected!");
 			connection.createStatement().execute("alter session set current_schema="+database);
 			
 			stmt = connection.createStatement();
