@@ -9,3 +9,4 @@ _build
 /_class
 .classpath
 .project
+lib/ma-agent.jar

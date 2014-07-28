@@ -78,10 +78,6 @@ exports.shell = shell = (command, args, input, options, callback) ->
       kill child.pid, kill_timeout, () ->
         console.log "child shell #{child_pid} was killed because over timeout #{timeout}" 
       
-  
-  
-  
-
 exports.findPath = findPath = (base_dir, p) ->
   while(true)
     pp = path.join(base_dir, p)
