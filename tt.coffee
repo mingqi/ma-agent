@@ -7,7 +7,7 @@ server = new Server('dev.monitorat.com');
 Fiber( () ->
   console.log "aaa"
   db = server.db('tt')
-  db.auth('mingqi', 'faf')
+  # db.auth('mingqi', 'faf')
   console.log "bbb"
   coll = db.getCollection('tt')
   console.log coll.find()

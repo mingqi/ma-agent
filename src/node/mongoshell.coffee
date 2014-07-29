@@ -21,7 +21,11 @@ module.exports = (mg_opts, command, callback) ->
   Fiber( () ->
     try
       db = server.db(mg_opts.database)
-      # db.auth(mg_opts.user, mg_opts.pwd)
+      if mg_opts.user? and mg_opts.user.trim().length > 0
+        try
+          db.auth(mg_opts.user, mg_opts.pwd)
+        catch e
+          return callback(new Error("database authentication failed")) 
       db_coll = db.getCollection(collection)
 
       find = db_coll.find
@@ -52,7 +56,6 @@ module.exports = (mg_opts, command, callback) ->
       else
         callback(null, result)
     catch e
-      console.log e.stack
       return callback(e)      
     finally
       server.close()
