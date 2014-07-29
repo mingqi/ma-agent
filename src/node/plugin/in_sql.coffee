@@ -8,6 +8,7 @@ shell = require('../util').shell
 util = require '../util'
 path = require 'path'
 glob = require 'glob'
+mongoshell = require '../mongoshell'
 
 ###
   monitor
@@ -23,6 +24,37 @@ glob = require 'glob'
 
 ERR_ROWS = "query return more then one row"
 ERR_COLUMNS = "there are more than one field in query's select"
+
+_mongo = (config, callback) ->
+  mongoshell config, config.query, (err, result) ->
+
+    return callback(err) if err
+    switch 
+      when us.isArray(result)
+        if result.length > 1
+          return callback(new Error(ERR_ROWS)) 
+        row = result[0]
+
+      when us.isObject(result)
+        row = result
+
+      when us.isString(result) or us.isNumber(result)
+        return callback(null, result)
+      else
+        return callback(new Error("query result '#{result}' is not acceptable value"))
+      
+
+    if not us.isObject(row)
+      return callback(new Error("query result '#{row}' is not acceptable value"))
+
+    if row._id?
+      delete row._id 
+
+    keys = us.keys(row)
+    if keys.length > 1
+      return callback(new Error(ERR_COLUMNS))
+
+    callback(null, row[keys[0]])
 
 _oracle = (config, callback) ->
   cp_opt = {
@@ -176,6 +208,7 @@ DATABASE_MAPPING =
   'postgresql' : _pg
   'mssql' : _mssql
   'oracle': _oracle
+  'mongo' : _mongo
 
 
 present = (config, properties) ->
@@ -196,13 +229,13 @@ module.exports = (config) ->
       if err
         return _report('problem', err.message)
 
-      intValue = parseInt(value) 
-      if isNaN(intValue)
+      floatValue = parseFloat(value) 
+      if isNaN(floatValue)
         return _report('problem', "query's result '#{value}' is not a number")
       _report('ok')
       emit({
         tag: 'tsd'
-        record: {metric: config.monitor, value: intValue}
+        record: {metric: config.monitor, value: floatValue}
       })
     )
 

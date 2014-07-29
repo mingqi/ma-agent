@@ -20,7 +20,9 @@
     "is-running" : "*",
     "commander" : "*",
     "pg" : "*",
-    "mssql" : "*"
+    "mssql" : "*",
+    "fibers" : ">= 1.0.0",
+    "mongo-sync" : "*"
   },
   "devDependencies" : {
     "sleep" : "*",

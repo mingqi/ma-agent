@@ -1,46 +1,62 @@
-jsparser = require './javascript'
+vm = require 'vm'
+Server = require("mongo-sync").Server;
+Fiber = require('fibers');
 
+module.exports = (mg_opts, command, callback) ->
+  ###
+  mg_opts:
+    host
+    port
+    database
+    user
+    pwd
+  ###
+  sp = command.split('.') 
+  if sp.length < 3 or sp[0] != 'db' or sp[1].length == 0
+    return callback(new Error("wrong mongo query format '#{command}', format should be db.<collection>.<query>}")) 
+  collection = sp[1]
 
+  server = new Server("#{mg_opts.host}:#{mg_opts.port}");
 
+  Fiber( () ->
+    try
+      db = server.db(mg_opts.database)
+      # db.auth(mg_opts.user, mg_opts.pwd)
+      db_coll = db.getCollection(collection)
 
-module.exports = (db, shell) ->
+      find = db_coll.find
+      findOne = db_coll.findOne
+      count = db_coll.count
+      new_db_coll = {
+        find : () ->
+          find.apply(db_coll, arguments)
 
-  execExpression = (expression) =>
-    switch expression.type
-      when "CallExpression"
-        return call(expression)
-      when "MemberExpression"
-        [obj, prop_name] = member(expression)
-        return obj[prop_name]
+        findOne : () ->
+          find.apply(db_coll, arguments)
+
+        count: () ->
+          count.apply(db_coll, arguments)
+        
+      }
+
+      db[collection] = new_db_coll
+
+      sandbox = 
+        db : db
+        callback : callback
+
+      result = vm.runInNewContext(command, sandbox)  
+
+      if result.toArray?
+        callback(null, result.toArray())
       else
-        throw new Error("express only support call and member") 
+        callback(null, result)
+    catch e
+      console.log e.stack
+      return callback(e)      
+    finally
+      server.close()
 
-  member = (member_expression) ->
-    # console.log member_expression
-    obj = null
-    if member_expression.object.type == 'Identifier'
-      if member_expression.object.name != 'db'
-        throw new Error("'#{member_expression.object.name}' is not a allowed identify")
-      else
-        obj = db
+    server.close() 
+  ).run()
 
-    else
-      obj = execExpression(member_expression.object)
-
-    return [obj, member_expression.property.name]
-
-  call = (call_expression) ->
-    callee = call_expression.callee
-    if callee.type != 'MemberExpression'
-      throw new Error("syntax Error: funcation call must be a member of object")
-
-    [obj, prop_name] = member(callee)
-    return obj[prop_name].apply(obj, [])
-  
-
-  syntax_tree = jsparser.parse(shell) 
-  exp = syntax_tree.body[0].expression
-  console.log syntax_tree
-  console.log exp.arguments[0]
-
-  return execExpression(exp)
