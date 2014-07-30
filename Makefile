@@ -76,10 +76,10 @@ rpm: _build npm _build/ma-agent.jar
 	rpmbuild -ba _build/rpmbuild/SPECS/ma-agent.spec
 
 install: rpm
-	sudo rpm -ihv _build/rpmbuild/RPMS/x86_64/ma-agent-${VERSION}-0.el6.x86_64.rpm
+	sudo rpm -ihv _build/rpmbuild/RPMS/x86_64/ma-agent-${VERSION}-1.x86_64.rpm
 
 rsync_dev:
-	rsync -avz ./_build/rpmbuild/RPMS/x86_64/ma-agent-1.0.0-0.el6.x86_64.rpm  mingqi@dev.monitorat.com:/var/tmp/
+	rsync -avz ./_build/rpmbuild/RPMS/x86_64/ma-agent-1.0.0-1.x86_64.rpm  mingqi@dev.monitorat.com:/var/tmp/
 
 clean:
 	rm -rf ./_build

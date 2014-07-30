@@ -61,7 +61,7 @@ module.exports = (config) ->
 
       parseTime =  (string_time) ->
         m = moment(string_time, config.timeFormat)
-        return m.toDate() if m 
+        return m.toDate() if m.isValid()
 
       online = (line) -> 
         x = xregexp(config.pattern)
