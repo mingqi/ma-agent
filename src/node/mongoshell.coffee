@@ -11,10 +11,13 @@ module.exports = (mg_opts, command, callback) ->
     user
     pwd
   ###
-  sp = command.split('.') 
-  if sp.length < 3 or sp[0] != 'db' or sp[1].length == 0
+
+  r = /db.([A-Za-z0-9_\-.]*).(count|find|findOne)/.exec(command)
+  if not r
     return callback(new Error("wrong mongo query format '#{command}', format should be db.<collection>.<query>}")) 
-  collection = sp[1]
+
+  collection = r[1]
+  code  = "coll."+command.substring(4+collection.length) 
 
   server = new Server("#{mg_opts.host}:#{mg_opts.port}");
 
@@ -46,10 +49,10 @@ module.exports = (mg_opts, command, callback) ->
       db[collection] = new_db_coll
 
       sandbox = 
-        db : db
+        coll : new_db_coll
         callback : callback
 
-      result = vm.runInNewContext(command, sandbox)  
+      result = vm.runInNewContext(code, sandbox)  
 
       if result.toArray?
         callback(null, result.toArray())
