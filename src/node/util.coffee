@@ -6,7 +6,7 @@ running = require('is-running')
 spawn = require('child_process').spawn
 fs = require 'fs'
 path = require 'path'
-
+moment = require 'moment'
 
 exports.systemTime = systemTime = () ->
   (new Date()).getTime()
@@ -89,7 +89,9 @@ exports.findPath = findPath = (base_dir, p) ->
 
   return null
 
-   
+exports.dateISOFormat = (d) ->
+  moment(d).format('YYYY-MM-DDTHH:mm:ssZ')
+
 
 exports.rest = (options, body, callback) ->
   if not callback

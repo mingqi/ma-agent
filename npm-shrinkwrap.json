@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "dependencies": {
     "MD5": {
-      "version": "1.2.0",
-      "from": "MD5@1.2.0",
-      "resolved": "https://registry.npmjs.org/MD5/-/MD5-1.2.0.tgz",
+      "version": "1.2.1",
+      "from": "MD5@1.2.1",
+      "resolved": "https://registry.npmjs.org/MD5/-/MD5-1.2.1.tgz",
       "dependencies": {
         "charenc": {
           "version": "0.0.1",
@@ -79,8 +79,8 @@
       }
     },
     "hoconfig-js": {
-      "version": "0.1.1",
-      "from": "hoconfig-js@*"
+      "version": "0.1.2",
+      "from": "hoconfig-js@0.1.2"
     },
     "is-running": {
       "version": "1.0.5",
@@ -109,7 +109,7 @@
               "dependencies": {
                 "nan": {
                   "version": "1.0.0",
-                  "from": "nan@~1.0.0",
+                  "from": "nan@1.0.0",
                   "resolved": "https://registry.npmjs.org/nan/-/nan-1.0.0.tgz"
                 }
               }
@@ -135,9 +135,9 @@
                   "resolved": "https://registry.npmjs.org/isarray/-/isarray-0.0.1.tgz"
                 },
                 "string_decoder": {
-                  "version": "0.10.25-1",
-                  "from": "string_decoder@~0.10.x",
-                  "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.25-1.tgz"
+                  "version": "0.10.25",
+                  "from": "string_decoder@0.10.25",
+                  "resolved": "https://registry.npmjs.org/string_decoder/-/string_decoder-0.10.25.tgz"
                 },
                 "inherits": {
                   "version": "2.0.1",
@@ -196,7 +196,7 @@
         },
         "readable-stream": {
           "version": "1.1.13-1",
-          "from": "readable-stream@~1.1.13",
+          "from": "readable-stream@1.1.13-1",
           "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-1.1.13-1.tgz",
           "dependencies": {
             "core-util-is": {
@@ -264,7 +264,7 @@
         },
         "nan": {
           "version": "0.6.0",
-          "from": "nan@~0.6.0",
+          "from": "nan@0.6.0",
           "resolved": "https://registry.npmjs.org/nan/-/nan-0.6.0.tgz"
         },
         "packet-reader": {
@@ -300,7 +300,7 @@
       "dependencies": {
         "async": {
           "version": "0.2.10",
-          "from": "async@0.2.x",
+          "from": "async@0.2.10",
           "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
         },
         "deep-equal": {
@@ -327,7 +327,7 @@
         },
         "ncp": {
           "version": "0.4.2",
-          "from": "ncp@0.4.x",
+          "from": "ncp@0.4.2",
           "resolved": "https://registry.npmjs.org/ncp/-/ncp-0.4.2.tgz"
         },
         "rimraf": {
@@ -356,7 +356,7 @@
       "dependencies": {
         "async": {
           "version": "0.2.10",
-          "from": "async@0.2.x",
+          "from": "async@0.2.10",
           "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
         },
         "colors": {
@@ -381,7 +381,7 @@
         },
         "request": {
           "version": "2.16.6",
-          "from": "request@2.16.x",
+          "from": "request@2.16.6",
           "resolved": "https://registry.npmjs.org/request/-/request-2.16.6.tgz",
           "dependencies": {
             "form-data": {

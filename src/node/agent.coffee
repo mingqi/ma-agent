@@ -1,4 +1,5 @@
 Engine = require './engine'
+plugin = require './plugin'
 upload = require './plugin/out_upload'
 us = require 'underscore'
 stdout = require './plugin/out_stdout'
@@ -8,11 +9,7 @@ glob = require 'glob'
 fs = require 'fs'
 md5 = require 'MD5'
 
-INPUT_PLUGINS = {
-  dbquery : require './plugin/in_sql'
-  tail : require './plugin/in_tail'
-  test : require './plugin/in_test'
-}
+
 
 _hashConfig = (config) ->
   pair_list = for k in us.keys(config).sort()
@@ -30,7 +27,6 @@ module.exports = Agent = (configer, inputs, outputs) ->
 
   for [match, output] in outputs
     engine.addOutput(match, output)
-
 
   flushInput = () ->
     configer( (err, config) ->
@@ -53,10 +49,16 @@ module.exports = Agent = (configer, inputs, outputs) ->
       for add_index in to_add
         in_conf = target[add_index]
         type = in_conf.type
-        plugin = INPUT_PLUGINS[type]
-        if not plugin
-          throw new Error("type #{type} is not supported")
-        input = plugin(in_conf)
+        in_plugin = plugin.plugin(type)
+        if not in_plugin
+          console.log "type #{type} is not supported"
+          continue
+        try
+          input = in_plugin(in_conf)
+        catch e
+          console.log e.stack
+          continue
+        
         engine.addInput(input, (err) ->
           if not err
             input_index[add_index] = input
@@ -66,16 +68,15 @@ module.exports = Agent = (configer, inputs, outputs) ->
 
 
   return {
-    start : () ->
+    start : (callback) ->
       engine.start((err) ->
+        return callback(err) if err
         flushInput()
         console.log "engine started"
-
         setInterval(flushInput, 2000)
+        callback()
       )
     
-    shutdown : () ->
-      engine.shutdown( (err) ->
-        console.log "engine shutdown"
-      )
+    shutdown : (callback) ->
+      engine.shutdown(callback)
   }

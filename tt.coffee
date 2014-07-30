@@ -1,16 +1,8 @@
-Server = require("mongo-sync").Server;
+fs = require 'fs'
+hoconfig = require 'hoconfig-js'
 
-Fiber = require('fibers');
+c = fs.readFileSync('/var/tmp/t.txt')
+console.log c.toString()
 
-server = new Server('dev.monitorat.com');
-
-Fiber( () ->
-  console.log "aaa"
-  db = server.db('tt')
-  # db.auth('mingqi', 'faf')
-  console.log "bbb"
-  coll = db.getCollection('tt')
-  console.log coll.find()
-  server.close()
-).run();
-
+b = hoconfig('/etc/ma-agent/monitor.d/a.conf')
+console.log b.metric11.pattern

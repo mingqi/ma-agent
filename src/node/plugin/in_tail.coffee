@@ -4,10 +4,17 @@ glob = require 'glob'
 path = require 'path'
 us = require 'underscore'
 dirty = require 'dirty'
-util = require 'util'
+util = require '../util'
 fs = require 'fs'
+moment = require 'moment'
 
 module.exports = (config) ->
+  ###
+    path
+    pattern: <time> and <value> two group capture
+    posfile
+    timeFormat: optional
+  ###
   tails = {}
   posdb = null
   flush_interval = null
@@ -36,6 +43,7 @@ module.exports = (config) ->
       ,
       {}
       )
+    
     for f in to_add
       inode = target_inodes[f]
       start = if us.contains(inodes, inode) then null else 0
@@ -51,14 +59,29 @@ module.exports = (config) ->
     start : (emit, cb) ->
       console.log "tail starting..."
 
+      parseTime =  (string_time) ->
+        m = moment(string_time, config.timeFormat)
+        return m.toDate() if m 
+
       online = (line) -> 
         x = xregexp(config.pattern)
         m = xregexp.exec(line, x)
-        if m and m.value
-          emit({
-            tag: 'tsd',
-            record: {metric: config.metric, value: parseInt(m.value)}
-          })
+
+        return if not m
+        value = parseFloat(m.value || '1')
+        return if not value
+
+        timestamp = (m.time and parseTime(m.time) ) || new Date()
+
+        emit({
+          tag: 'tsd',
+          record: {
+            metric : config.monitor 
+            value : value
+            timestamp : util.dateISOFormat(timestamp)
+          }
+        })
+
       posdb = dirty(config.posfile) 
       posdb.on('load', () ->
 

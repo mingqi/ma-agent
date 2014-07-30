@@ -2,6 +2,7 @@
 
 us = require 'underscore'
 Agent = require '../agent'
+plugin = require '../plugin'
 config = require '../config'
 hoconfig = require 'hoconfig-js'
 stdout = require '../plugin/out_stdout'
@@ -12,7 +13,8 @@ path = require 'path'
 supervisor = require '../supervisor'
 version = require '../version'
 
-run = () -> 
+agent = null
+run = (callback) -> 
   config_file = program.config or '/etc/ma-agent/ma-agent.conf'
   root = program.root or '/opt/ma-agent/'
   options = hoconfig(config_file)
@@ -36,6 +38,19 @@ run = () ->
   merged_config = (callback) ->
     config.merge(remote_backup_config, local, callback)
     
+
+  input_plugins = []
+  local (err, config) ->
+    return callback(err)  if err
+    for in_config in config
+      in_plugin = plugin.plugin(in_config.type)
+      if not in_plugin
+        return callback(new Error("#{in_config.type} is not supported plugin type"))
+      try
+        input_plugins.push(in_plugin(in_config))
+      catch e
+        return callback(new Error("failed to initialize input config '#{in_config.monitor}': #{e.message}"))
+  input_plugins.push host({interval: 10}) 
 
   tsd_upload = upload({
     remote_host : options.remote_host
@@ -66,7 +81,7 @@ run = () ->
 
   agent = Agent(
     merged_config,
-    [host({interval: 10})], 
+    [], 
     [
       ['tsd', tsd_upload],
       ['tsd', stdout()],
@@ -77,7 +92,7 @@ run = () ->
     ]
   )
 
-  agent.start()
+  agent.start(callback)
 
 supervisord = () ->
   script = process.argv[1]
@@ -100,5 +115,20 @@ program
 if program.supervisord and not process.env.__supervisor_child
   supervisord()
 else
-  run()
-  supervisor.checkHeartbeat(3000)
+  run (err) ->
+    if err
+      console.log err.stack
+      process.exit(1) 
+    supervisor.checkHeartbeat(3000)
+
+    process.on 'SIGTERM', () ->
+      agent.shutdown (err) ->
+        console.log "ffffffffffff"
+        console.log err.stack if err
+        process.exit()
+
+     process.on 'SIGINT', () ->
+      agent.shutdown (err) ->
+        console.log err.stack if err
+        process.exit()
+      
