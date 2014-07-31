@@ -73,7 +73,7 @@ rpm: _build npm _build/ma-agent.jar
 	mv _build/ma-agent-${VERSION}.tar.gz _build/rpmbuild/SOURCES
 	cp redhat/ma-agent.spec _build/rpmbuild/SPECS
 
-	rpmbuild -ba _build/rpmbuild/SPECS/ma-agent.spec
+	cd _build/rpmbuild && rpmbuild -ba SPECS/ma-agent.spec
 
 install: rpm
 	sudo rpm -ihv _build/rpmbuild/RPMS/x86_64/ma-agent-${VERSION}-1.x86_64.rpm
