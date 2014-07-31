@@ -31,13 +31,13 @@ rpm: _build npm _build/ma-agent.jar
 	## node
 	tar -xf node/node-v0.10.29-linux-x64.tar.gz -C _build/
 	mv _build/node-v0.10.29-linux-x64 ${OPT_ROOT}/node
-	chmod -R 644 ${OPT_ROOT}/node/
+	find ${OPT_ROOT}/node/ -type f -exec chmod 644 {} +
 	chmod 755 ${OPT_ROOT}/node/bin/node
 
 	## jre
 	tar -xf jre/jre-7u65-linux-x64.gz -C _build
 	mv _build/jre1.7.0_65 ${OPT_ROOT}/jre
-	chmod -R 644 ${OPT_ROOT}/jre/
+	find ${OPT_ROOT}/jre/ -type f -exec chmod 644 {} +
 	chmod 755 ${OPT_ROOT}/jre/bin/java
 
 	## jar
@@ -50,7 +50,7 @@ rpm: _build npm _build/ma-agent.jar
 	cp -r _build/npm /tmp/npm
 	cd /tmp && cnpm install  ./npm
 	mv /tmp/node_modules ${OPT_ROOT}/
-	chmod -R 644 ${OPT_ROOT}/node_modules
+	find ${OPT_ROOT}/node_modules -type f -exec chmod 644 {} +
 
 
 	# bin var
