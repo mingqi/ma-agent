@@ -80,8 +80,8 @@ run = (callback) ->
     })
 
   agent = Agent(
-    merged_config,
-    [], 
+    remote_backup_config,
+    input_plugins, 
     [
       ['tsd', tsd_upload],
       ['tsd', stdout()],
@@ -123,7 +123,6 @@ else
 
     process.on 'SIGTERM', () ->
       agent.shutdown (err) ->
-        console.log "ffffffffffff"
         console.log err.stack if err
         process.exit()
 

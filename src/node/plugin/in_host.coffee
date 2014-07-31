@@ -21,5 +21,5 @@ module.exports = (config) ->
     shutdown : (cb) ->
       console.log "intest shutdonw... #{interval_obj}"
       clearInterval(interval_obj) if interval_obj
-      cb(new Error('has error when shutdown in_test'))
+      cb()
   }
