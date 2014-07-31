@@ -1,7 +1,7 @@
 %define        __spec_install_post %{nil}
 %define          debug_package %{nil}
 %define        __os_install_post %{_dbpath}/brp-compress
-%define 	   _topdir /home/vagrant/monitorat/ma-agent/_build/rpmbuild
+%define 	   _topdir %(echo $PWD)/
 
 Summary: ma-agent
 Name: ma-agent
