@@ -83,7 +83,7 @@ module.exports = (config) ->
 
         return if not m
         value = parseFloat(m.value || '1')
-        return if not value
+        return if isNaN(value)
 
         timestamp = (m.time and parseTime(m.time) ) || new Date()
 
