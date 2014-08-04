@@ -8,6 +8,7 @@ INPUT_PLUGINS = {
   dbquery : require './plugin/in_sql'
   log : log
   test : require './plugin/in_test'
+  script : require './plugin/in_script'
 }
 
 exports.plugin = (type) ->

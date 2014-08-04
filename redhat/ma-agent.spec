@@ -16,6 +16,7 @@ SOURCE0: %{name}-%{version}.tar.gz
 #Source1: %{name}.init
 BuildRoot: /var/tmp/ma-agent/rpmbuild/BUILDROOT
 
+Requires: /usr/sbin/useradd /usr/sbin/groupadd
 Requires: /sbin/chkconfig
 Requires(post): /sbin/chkconfig
 Requires(post): /sbin/service
@@ -45,6 +46,11 @@ rm -rf %{buildroot}
 %post
 echo "Configure ma-agent to start, when booting up the OS..."
 /sbin/chkconfig --add ma-agent
+echo "adding 'ma-agent-ro' group..."
+getent group ma-agent-ro >/dev/null || /usr/sbin/groupadd  ma-agent-ro
+echo "adding 'ma-agent-ro' user..."
+getent passwd ma-agent-ro >/dev/null || \
+  /usr/sbin/useradd -g ma-agent-ro -s /bin/bash -c 'ma-agent-ro' ma-agent-ro
 
 %preun
 echo "Stopping ma-agent ..."

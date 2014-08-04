@@ -44,8 +44,13 @@ exports.kill = kill = (pid, timeout, callback) ->
 
 
 exports.shell = shell = (command, args, input, options, callback) ->
-  us.extend(args, {stdio: 'pipe'})
-  child = spawn(command, args, options)
+  cp_opt = {
+    detached: false
+    env : process.env
+    cwd : process.cwd     
+    stdio: 'pipe'
+  }
+  child = spawn(command, args, us.extend(cp_opt, options))
 
   if input
     child.stdin.end(input)
@@ -59,16 +64,20 @@ exports.shell = shell = (command, args, input, options, callback) ->
     child_output += data
 
   is_timeout = false
-  child.on 'exit', (code) ->
+  child.on 'close', (code) ->
     if not is_timeout
       return callback(null, code, child_output)
     else
       return callback(new Error("shell execute over timeout #{timeout}"))
 
+  child.on 'error', (err) ->
+    console.log err
+  
+
   child_pid = child.pid
 
-  timeout = options.timeout || 3000
-  kill_timeout = options.kill_timeout || 3000
+  timeout = options?.timeout || 3000
+  kill_timeout = options?.kill_timeout || 3000
   wait 100, timeout
   , () ->
     not running(child.pid)

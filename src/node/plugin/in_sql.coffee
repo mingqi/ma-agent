@@ -57,17 +57,11 @@ _mongo = (config, callback) ->
     callback(null, row[keys[0]])
 
 _oracle = (config, callback) ->
-  cp_opt = {
-    detached: false
-    env : process.env
-    cwd : process.cwd     
-    stdio: 'pipe'
+  opts = {
     timeout : 5000
-    # stdio: 'inherit'
   }
 
   jar_path = util.findPath( __dirname, 'lib/ma-agent.jar')
-  console.log "jar_path=#{jar_path}"
   return callback(new Error("can't find out ma-agent.jar")) if not jar_path  
   jar_path = path.dirname(jar_path)
   cp = glob.sync("#{jar_path}/*.jar").join(':')
@@ -91,7 +85,7 @@ _oracle = (config, callback) ->
     password: #{config.pwd}
     afaf
   """
-  shell java_path, args, shell_input, cp_opt, (err, code, child_output) ->
+  shell java_path, args, shell_input, opts, (err, code, child_output) ->
     if err
       return console.log err 
     console.log "child exit with #{code}"
@@ -253,6 +247,4 @@ module.exports = (config) ->
       clearInterval(interval_obj) if interval_obj
       cb()
 
-    problem : () ->
-      return null; 
   }
