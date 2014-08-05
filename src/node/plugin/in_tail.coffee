@@ -100,7 +100,9 @@ module.exports = (config) ->
           else
             tail_options = {}
           tails[f] = new Tail(f, tail_options)
-          tails[f].on('line', online)
+          tails[f].on('line', (line) ->
+            setImmediate( online, line )
+          )
 
         if inodes.length  == 0
           plugin_report('problem', "no files was found")
