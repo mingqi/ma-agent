@@ -1,5 +1,6 @@
 version = require '../version'
 os = require 'os'
+util = require '../util'
 
 # interval
 module.exports = (config) ->
@@ -7,10 +8,10 @@ module.exports = (config) ->
   count = 0
   metric = config.metric
   report = (emit) ->
-      emit({
-        tag: 'host',
-        record: { hostname: os.hostname(), version: version }
-        })
+    emit({
+      tag: 'host',
+      record: { hostname: os.hostname(), version: version }
+      })
 
   return {
     start : (emit, cb) ->

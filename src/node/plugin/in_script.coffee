@@ -20,10 +20,7 @@ module.exports = (config) ->
         return plugin_report('problem', "command's output is not a number")
 
       plugin_report('ok')
-      emit({
-        tag: 'tsd'
-        record: {metric: config.monitor, value: floatValue}
-      })      
+      util.emitTSD(emit, config.monitor, floatValue)
 
   interval_obj = null
 

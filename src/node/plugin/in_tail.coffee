@@ -86,15 +86,7 @@ module.exports = (config) ->
         return if isNaN(value)
 
         timestamp = (m.time and parseTime(m.time) ) || new Date()
-
-        emit({
-          tag: 'tsd',
-          record: {
-            metric : config.monitor 
-            value : value
-            timestamp : util.dateISOFormat(timestamp)
-          }
-        })
+        util.emitTSD(emit, config.monitor, value, timestamp)
 
       plugin_report = report.PluginReport(emit, config.monitor)
       posdb = dirty(config.posfile) 

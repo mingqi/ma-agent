@@ -98,8 +98,17 @@ exports.findPath = findPath = (base_dir, p) ->
 
   return null
 
-exports.dateISOFormat = (d) ->
+exports.dateISOFormat = dateISOFormat = (d) ->
   moment(d).format('YYYY-MM-DDTHH:mm:ssZ')
+
+exports.emitTSD = (emit, metric, value, timestamp) ->
+  emit(
+    tag: 'tsd',
+    record: 
+      metric : metric
+      value : value
+      timestamp : dateISOFormat(timestamp || new Date() )  
+  )
 
 
 exports.rest = (options, body, callback) ->

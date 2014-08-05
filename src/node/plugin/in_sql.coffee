@@ -227,10 +227,7 @@ module.exports = (config) ->
       if isNaN(floatValue)
         return _report('problem', "query's result '#{value}' is not a number")
       _report('ok')
-      emit({
-        tag: 'tsd'
-        record: {metric: config.monitor, value: floatValue}
-      })
+      util.emitTSD(emit, config.monitor, floatValue)
     )
 
   interval_obj = null
