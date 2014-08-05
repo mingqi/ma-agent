@@ -5,7 +5,7 @@
 
 Summary: ma-agent
 Name: ma-agent
-Version: 1.0.1
+Version: 1.0.0
 License: APL2
 Release: 1
 
