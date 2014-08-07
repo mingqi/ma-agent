@@ -5,7 +5,7 @@
 	<target name="init" description="Create temporary directories and setup properties" depends="">
 		<mkdir dir="_build/classes" />
 		<path id="classpath">
-			<fileset dir="lib" includes="**/*.jar" />
+			<fileset dir="resources/jars" includes="**/*.jar" />
 			
 		</path>
 	</target>
@@ -16,12 +16,12 @@
 
 	<target name="jar" description="Jar up our class files" depends="compile">
 		<jar destfile="_build/ma-agent.jar" basedir="_build/classes" />
-		<copy file="_build/ma-agent.jar" todir="lib" />
+		<!-- <copy file="_build/ma-agent.jar" todir="lib" /> -->
 	</target>
 
 
 	<target name="clean" description="Clean up intermediate files">
-		<delete dir="_build" quiet="true" />
-		<delete file="lib/ma-agent.jar" />
+		<delete dir="_build/classes" quiet="true" />
+		<delete file="_build/ma-agent.jar" />
 	</target>
 </project>

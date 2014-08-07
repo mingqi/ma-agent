@@ -1,9 +1,15 @@
 VERSION=1.0.0
 ROOT=_build/ma-agent-${VERSION}
 OPT_ROOT=${ROOT}/opt/ma-agent
+ARCH=`uname -m`
+if [ $ARCH = 'i686' ]; then
+	echo "abc"
+fi
 
 all: 
 	echo "please give task name: npm, rpm... etc"
+	echo ${ARCH}
+	echo ${JRE}
 
 _build:
 	mkdir _build
@@ -85,7 +91,7 @@ clean:
 	rm -rf ./_build
 
 linstall: _build/ma-agent.jar lib npm luninstall
-	cp bin/* /opt/ma-agent/bin/	
+	cp bin/* /opt/ma-agent/bin/ 
 	cp _build/ma-agent.jar /opt/ma-agent/lib
 	cp lib/*.jar /opt/ma-agent/lib
 	cp -r _build/npm/lib/ /opt/ma-agent/node_modules/ma-agent/lib

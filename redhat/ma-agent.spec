@@ -13,8 +13,9 @@ Group: System Environment/Daemons
 Vendor: Monitor@, Inc.
 URL: http://monitorat.com/
 SOURCE0: %{name}-%{version}.tar.gz
-#Source1: %{name}.init
 BuildRoot: /var/tmp/ma-agent/rpmbuild/BUILDROOT
+AutoReqProv: no
+
 
 Requires: /usr/sbin/useradd /usr/sbin/groupadd
 Requires: /sbin/chkconfig
