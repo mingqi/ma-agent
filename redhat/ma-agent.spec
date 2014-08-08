@@ -35,11 +35,9 @@ Requires(preun): /sbin/service
 
 %install
 rm -rf %{buildroot}
-mkdir -p  %{buildroot}
-
-# in builddir
-cp -a * %{buildroot}
-
+mkdir -p  %{buildroot}/opt/ma-agent
+cp -a * %{buildroot}/opt/ma-agent
+cp -a res/* %{buildroot}
 
 %clean
 rm -rf %{buildroot}

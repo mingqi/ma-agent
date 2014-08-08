@@ -4,4 +4,3 @@
 	dh $@
 
 override_dh_shlibdeps:
-	echo "this is override_dh_shlibdeps"
