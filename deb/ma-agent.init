@@ -1,13 +1,5 @@
 #!/bin/bash
 #
-# /etc/rc.d/init.d/ma-agent
-#
-# chkconfig: - 80 20
-# description: ma-agent
-# processname: ma-agent
-# pidfile: /var/run/ma-agent.pid
-#
-
 ### BEGIN INIT INFO
 # Provides:          ma-agent
 # Required-Start:    $network $local_fs $remote_fs
