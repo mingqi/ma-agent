@@ -13,6 +13,7 @@ Group: System Environment/Daemons
 Vendor: Monitor@, Inc.
 URL: http://monitorat.com/
 SOURCE0: %{name}-%{version}.tar.gz
+Source1: %{name}.init
 BuildRoot: /var/tmp/ma-agent/rpmbuild/BUILDROOT
 AutoReqProv: no
 
@@ -38,6 +39,7 @@ rm -rf %{buildroot}
 mkdir -p  %{buildroot}/opt/ma-agent
 cp -a * %{buildroot}/opt/ma-agent
 cp -a res/* %{buildroot}
+install -m 755 %{S:1} ${buildroot}/etc/init.d/%{name}
 
 %clean
 rm -rf %{buildroot}

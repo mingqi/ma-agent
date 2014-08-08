@@ -41,7 +41,6 @@ mv _build/jre1.7.0_65 ${OPT_ROOT}/jre
 # find ${OPT_ROOT}/jre/ -type f -exec chmod 644 {} +
 # chmod 755 ${OPT_ROOT}/jre/bin/java
 
-
 ## jar
 mkdir -p ${OPT_ROOT}/lib
 cp _build/ma-agent.jar ${OPT_ROOT}/lib
@@ -70,8 +69,8 @@ mkdir -p ${ROOT}/res/etc/ma-agent/monitor.d
 cp conf/dev.conf ${ROOT}/res/etc/ma-agent/ma-agent.conf
 
 ## init.d
-mkdir -p ${ROOT}/res/etc/init.d/
-cp init.d/ma-agent ${ROOT}/res/etc/init.d
+# mkdir -p ${ROOT}/res/etc/init.d/
+# cp init.d/ma-agent ${ROOT}/res/etc/init.d
 
 ## tarball
 pushd _build && tar -zcf ma-agent-${VERSION}.tar.gz ma-agent-${VERSION}

@@ -8,6 +8,7 @@ us = require 'underscore'
 dirty = require 'dirty'
 fs = require 'fs'
 moment = require 'moment'
+os = require 'os'
 
 module.exports = (config) ->
   ###
@@ -86,7 +87,7 @@ module.exports = (config) ->
         return if isNaN(value)
 
         timestamp = (m.time and parseTime(m.time) ) || new Date()
-        util.emitTSD(emit, config.monitor, value, timestamp)
+        util.emitTSD(emit, config.monitor, value, timestamp, {host: os.hostname()})
 
       plugin_report = report.PluginReport(emit, config.monitor)
       posdb = dirty(config.posfile) 
