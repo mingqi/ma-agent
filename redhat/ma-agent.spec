@@ -7,7 +7,7 @@ Summary: ma-agent
 Name: ma-agent
 Version: 1.0.0
 License: APL2
-Release: 1
+Release: 2
 
 Group: System Environment/Daemons
 Vendor: Monitor@, Inc.
