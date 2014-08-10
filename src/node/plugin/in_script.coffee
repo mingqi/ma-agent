@@ -8,7 +8,7 @@ module.exports = (config) ->
 
   run = (emit) ->
     args = [
-      'ma-agent-ro'
+      'ma-agent'
       '-c', config.command
     ]
     util.shell '/bin/su', args, null, null, (err, code, output) ->

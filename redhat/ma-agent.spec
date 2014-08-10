@@ -52,7 +52,7 @@ echo "adding 'ma-agent-ro' group..."
 getent group ma-agent-ro >/dev/null || /usr/sbin/groupadd  ma-agent-ro
 echo "adding 'ma-agent-ro' user..."
 getent passwd ma-agent-ro >/dev/null || \
-  /usr/sbin/useradd -g ma-agent-ro -s /bin/bash -c 'ma-agent-ro' ma-agent-ro
+  /usr/sbin/useradd -g ma-agent -s /bin/bash -c 'ma-agent' ma-agent
 
 %preun
 echo "Stopping ma-agent ..."
