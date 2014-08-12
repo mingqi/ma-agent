@@ -72,7 +72,7 @@ module.exports = (config) ->
 
   return {
     start : (emit, callback) ->
-      console.log "tail starting..."
+      logger.info "tail plugin starting..."
 
       parseTime =  (string_time) ->
         m = moment(string_time, config.timeFormat)
@@ -114,7 +114,7 @@ module.exports = (config) ->
       )
 
     shutdown : (callback) ->
-      console.log "tail shutdonw..."
+      logger.info "tail plugin shutdonw..."
       if flush_interval
         clearInterval(flush_interval)
       for _path, tail of tails 

@@ -26,16 +26,14 @@ module.exports = (config) ->
 
   return {
     start : (emit, cb) ->
-      console.log "start script plugin ..."
-      console.log config
+      logger.info "script plugin starting ..."
       plugin_report = report.PluginReport(emit, config.monitor)
       run(emit)
       interval_obj = setInterval(run, interval * 1000, emit)
       cb()
     
     shutdown : (cb) ->
-      console.log "shutdonw script plugin ... "
+      logger.info "script plugin shutdown ... "
       clearInterval(interval_obj) if interval_obj
       cb()
-
   }

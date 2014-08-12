@@ -87,9 +87,8 @@ _oracle = (config, callback) ->
   """
   shell java_path, args, shell_input, opts, (err, code, child_output) ->
     if err
-      return console.log err 
-    console.log "child exit with #{code}"
-    console.log child_output
+      return logger.error err 
+    logger.info "child exit with #{code}: #{child_output}"
     switch code
       when 11    # no value
         return callback() 
@@ -120,7 +119,6 @@ _mssql = (config, callback) ->
     req = new mssql.Request(conn)
 
     req.query config.query, (err, result) ->
-      console.log config.query
       try
         if err
           return callback err
@@ -233,15 +231,14 @@ module.exports = (config) ->
   interval_obj = null
   return {
     start : (emit, cb) ->
-      console.log "sql start..."
+      logger.info "sql plugin start..."
       _report = report.PluginReport(emit, config.monitor)
       query(emit)
       interval_obj = setInterval(query, interval * 1000, emit)
       cb()
     
     shutdown : (cb) ->
-      console.log "sql shutdonw... #{interval_obj}"
+      logger.info "sql plugin shutdonw... "
       clearInterval(interval_obj) if interval_obj
       cb()
-
   }

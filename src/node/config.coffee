@@ -43,7 +43,7 @@ exports.remote = remote = (options, cb) ->
     }
   , (err, status, result) ->
       if err
-        console.log err
+        logger.error err
         return cb(new VError(err, "failed to call remote service grab montior list"))       
       if status != 200
         return cb(new Error("call /montor return error status #{status}"))

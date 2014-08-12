@@ -22,7 +22,7 @@ Upload = (config) ->
   return {
     
     start : (callback) ->
-      console.log "upload started"
+      logger.info "upload plugin for #{config.uri} starting..."
       callback()    
 
     shutdown : (callback) ->

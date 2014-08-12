@@ -15,12 +15,12 @@ module.exports = (config) ->
 
   return {
     start : (emit, cb) ->
-      console.log "in_agent start..."
+      logger.info "agent report plugin start"
       interval_obj = setInterval(report, config.interval * 1000, emit)
       cb()
     
     shutdown : (cb) ->
-      console.log "intest shutdonw... #{interval_obj}"
+      logger.info "agent report plugin shutdonw"
       clearInterval(interval_obj) if interval_obj
       cb()
   }

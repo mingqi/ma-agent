@@ -31,7 +31,7 @@ module.exports = Agent = (configer, inputs, outputs) ->
   flushInput = () ->
     configer( (err, config) ->
       if err
-        console.log err.stack
+        logger.error err.stack
         return
       target = {}
       for in_conf in config
@@ -51,12 +51,12 @@ module.exports = Agent = (configer, inputs, outputs) ->
         type = in_conf.type
         in_plugin = plugin.plugin(type)
         if not in_plugin
-          console.log "type #{type} is not supported"
+          logger.error "type #{type} is not supported"
           continue
         try
           input = in_plugin(in_conf)
         catch e
-          console.log e.stack
+          logger.error e.stack
           continue
         
         engine.addInput(input, (err) ->
@@ -72,7 +72,7 @@ module.exports = Agent = (configer, inputs, outputs) ->
       engine.start((err) ->
         return callback(err) if err
         flushInput()
-        console.log "engine started"
+        logger.info "engine started"
         setInterval(flushInput, 2000)
         callback()
       )

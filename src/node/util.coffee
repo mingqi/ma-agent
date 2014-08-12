@@ -71,7 +71,7 @@ exports.shell = shell = (command, args, input, options, callback) ->
       return callback(new Error("shell execute over timeout #{timeout}"))
 
   child.on 'error', (err) ->
-    console.log err
+    logger.error err
   
 
   child_pid = child.pid
@@ -85,7 +85,7 @@ exports.shell = shell = (command, args, input, options, callback) ->
     if not not_running
       is_timeout = true
       kill child.pid, kill_timeout, () ->
-        console.log "child shell #{child_pid} was killed because over timeout #{timeout}" 
+        logger.warn "child shell #{child_pid} was killed because over timeout #{timeout}" 
       
 exports.findPath = findPath = (base_dir, p) ->
   while(true)
@@ -145,7 +145,6 @@ exports.rest = (options, body, callback) ->
               try
                 r = JSON.parse(result)
               catch e
-                console.log response.statusCode
                 callback(new Error("bad response, not JSON formant: #{result}"))      
               callback(null, response.statusCode, r) 
               
@@ -155,7 +154,6 @@ exports.rest = (options, body, callback) ->
             result = JSON.parse(buffer.toString())
             callback(null, response.statusCode, result) 
           catch e
-            console.log response.statusCode
             callback(new Error("bad response, not JSON formant: #{buffer.toString()}"))      
     )
   )

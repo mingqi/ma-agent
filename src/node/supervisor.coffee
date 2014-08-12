@@ -82,7 +82,7 @@ exports.checkHeartbeat = checkHeartbeat = (timeout) ->
   setInterval(() ->
     return if not last_heartbeat
     if (util.systemTime() - last_heartbeat ) > timeout
-      console.log "too long not receive parent heartbeat, quit."
+      logger.warn "too long not receive parent heartbeat, quit."
       process.exit()
   , 500
   )

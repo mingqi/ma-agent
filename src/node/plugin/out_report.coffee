@@ -15,7 +15,6 @@ Upload = (config) ->
     name : 'upload'
     
     start : (cb) ->
-      console.log "upload started"
       cb()    
 
     shutdown : (cb) ->
@@ -43,7 +42,6 @@ Upload = (config) ->
         res.on('data', (chunk) -> 
           if res.statusCode != 200
             cb(new Error("upload service return error response, status=#{res.statusCode}"))
-          console.log "post status is " + res.statusCode
         ) 
       )
 
@@ -51,7 +49,6 @@ Upload = (config) ->
         cb(new VError(e, "failed to send data to #{remote_host}:#{remote_port}"))
       )
 
-      console.log("there are #{body.length} record ready for send ")
       zlib.gzip(JSON.stringify(body), (err, result) ->
         req.write(result);
         req.end() 

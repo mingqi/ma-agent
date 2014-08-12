@@ -1,5 +1,3 @@
-#!/usr/local/ma-agent/node/bin/node
-
 us = require 'underscore'
 Agent = require '../agent'
 plugin = require '../plugin'
@@ -13,12 +11,12 @@ path = require 'path'
 supervisor = require '../supervisor'
 version = require '../version'
 
-agent = null
-run = (callback) -> 
-  config_file = program.config or '/etc/ma-agent/ma-agent.conf'
-  root = program.root or '/opt/ma-agent/'
-  options = hoconfig(config_file)
+global.logger = logger = winston = require 'winston'
+logger.remove(winston.transports.Console)
 
+agent = null
+
+run = (root, options, callback) -> 
   remote_config = (callback) ->
     config.remote({
       host: options.remote_host, 
@@ -111,23 +109,35 @@ program
   .option('-c, --config [path]', 'config file')
   .option('-s, --supervisord', 'use supervisord mode')
   .parse(process.argv)
-  
+
+options = hoconfig(program.config or '/etc/ma-agent/ma-agent.conf')  
+
+## init logger
+console.log options.logfile
+if options.logfile == 'console'
+  logger.add(winston.transports.Console, {level: options.loglevel, timestamp: true})
+else
+  logger.add(winston.transports.File, {filename: options.logfile, level: options.loglevel, timestamp:true});
+
 if program.supervisord and not process.env.__supervisor_child
   supervisord()
 else
-  run (err) ->
+  ## this is child run
+  root = program.root or '/opt/ma-agent/'
+  run root, options, (err) ->
     if err
-      console.log err.stack
+      logger.error err.stack
       process.exit(1) 
+
     supervisor.checkHeartbeat(3000)
 
     process.on 'SIGTERM', () ->
       agent.shutdown (err) ->
-        console.log err.stack if err
+        logger.error err.stack if err
         process.exit()
 
      process.on 'SIGINT', () ->
       agent.shutdown (err) ->
-        console.log err.stack if err
+        logger.error err.stack if err
         process.exit()
       
