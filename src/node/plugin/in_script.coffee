@@ -3,7 +3,7 @@ report = require '../report'
 
 module.exports = (config) ->
 
-  interval = parseInt(config.interval) || 10
+  interval = parseInt(config.interval) || 20
   plugin_report = null
 
   run = (emit) ->

@@ -212,7 +212,7 @@ module.exports = (config) ->
   port = parseInt(config.port)
   assert.ok(port, "port must be a number: #{config.port}")
   assert.ok(parseInt(config.interval), "interval must be number: #{config.interval}") if config.interval
-  interval = parseInt(config.interval) || 10
+  interval = parseInt(config.interval) || 20
 
   _report = null
   query = (emit) ->
