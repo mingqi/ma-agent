@@ -1,3 +1,5 @@
+program = require 'commander'
+path = require 'path'
 us = require 'underscore'
 Agent = require '../agent'
 plugin = require '../plugin'
@@ -6,10 +8,9 @@ hoconfig = require 'hoconfig-js'
 stdout = require '../plugin/out_stdout'
 upload = require '../plugin/out_upload'
 host = require '../plugin/in_host'
-program = require 'commander'
-path = require 'path'
 supervisor = require '../supervisor'
 version = require '../version'
+util = require '../util'
 
 global.logger = logger = winston = require 'winston'
 logger.remove(winston.transports.Console)
@@ -113,11 +114,25 @@ program
 options = hoconfig(program.config or '/etc/ma-agent/ma-agent.conf')  
 
 ## init logger
-console.log options.logfile
-if options.logfile == 'console'
-  logger.add(winston.transports.Console, {level: options.loglevel, timestamp: true})
+console.log options.log_file
+if options.log_file == 'console'
+  logger.add(winston.transports.Console, {level: options.log_level, timestamp: true})
 else
-  logger.add(winston.transports.File, {filename: options.logfile, level: options.loglevel, timestamp:true});
+  maxSize = 10 * 1024 * 1024 #10m
+  if options.log_file_size
+    maxSize = util.parseHumaneSize(options.log_file_size)
+
+  maxFiles = 5
+  if options.log_file_count
+    maxFiles = parseInt(options.log_file_count)
+
+  logger.add(winston.transports.File, {
+    filename: options.log_file, 
+    level: options.log_level, 
+    timestamp: true, 
+    maxsize: maxSize
+    maxFiles: maxFiles
+    json: false});
 
 if program.supervisord and not process.env.__supervisor_child
   supervisord()

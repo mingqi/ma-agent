@@ -22,7 +22,8 @@
     "pg" : "*",
     "mssql" : "*",
     "fibers" : ">= 1.0.0",
-    "mongo-sync" : "*"
+    "mongo-sync" : "*",
+    "human-format" : "*"
   },
   "devDependencies" : {
     "sleep" : "*",
