@@ -11,3 +11,4 @@
 	"query" : "select count(*) from detail_weblogs where add_date > now() - interval 5 minute"
 }
 ]
+
