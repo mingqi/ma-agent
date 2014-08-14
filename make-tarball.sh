@@ -1,11 +1,18 @@
 #!/bin/bash -x
+set -e 
+
 VERSION=`cat VERSION`
 ROOT=_build/ma-agent-${VERSION}
 # OPT_ROOT=${ROOT}/opt/ma-agent
 OPT_ROOT=${ROOT}
 NODE_VERSION='0.10.29'
 JRE_VERSION='7u65'
-ARCH=`uname -m`
+if [[ -n $1 ]]; then
+	ARCH='x'
+else
+	ARCH=`uname -m`
+fi
+
 if [ $ARCH = 'x86_64' ]; then
   NODE_ARCH='x64'
   JRE_ARCH='x64'
@@ -13,6 +20,7 @@ else
   NODE_ARCH='x86'
   JRE_ARCH='i586'
 fi
+
 NODE=node-v${NODE_VERSION}-linux-${NODE_ARCH}
 JRE=jre-${JRE_VERSION}-linux-${JRE_ARCH}
 
