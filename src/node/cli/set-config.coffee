@@ -55,7 +55,6 @@ for key, replaced of keys_replaced
   if not replaced 
     new_lines.push "#{key} = #{key_values[key]}"
 
-console.log program.set
 if program.set
   try
     fs.renameSync(config_file, config_file+'.bak')

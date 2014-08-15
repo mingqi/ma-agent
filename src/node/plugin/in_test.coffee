@@ -7,6 +7,8 @@ module.exports = (config) ->
   plugin_report = null
 
   query = (emit) ->
+    if count >  5
+      throw new Error("this is exception")
     emit({
       tag: config.tag
       record: { metric: monitor, value: count+=1 }

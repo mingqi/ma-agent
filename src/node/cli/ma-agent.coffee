@@ -11,13 +11,11 @@ host = require '../plugin/in_host'
 supervisor = require '../supervisor'
 version = require '../version'
 util = require '../util'
+winston = require 'winston'
 
-global.logger = logger = winston = require 'winston'
-logger.remove(winston.transports.Console)
+global.logger = new (winston.Logger)({exitOnError: true})
 
-agent = null
-
-run = (root, options, callback) -> 
+runAgent = (root, options, callback) -> 
   remote_config = (callback) ->
     config.remote({
       host: options.remote_host, 
@@ -91,55 +89,15 @@ run = (root, options, callback) ->
     ]
   )
 
-  agent.start(callback)
+  agent.start (err) ->
+    return callback(err) if err
+    callback(null, agent)   
+  
 
-supervisord = () ->
-  script = process.argv[1]
-  args = process.argv[2..]
-  sup = supervisor.Supervisor(script, args, 3000)
-  sup.run((err) ->
-    if err
-      console.log "failed to start ma-agent: #{err.message}"   
-      process.exit(1)
-  )
-
-
-program
-  .version(version)
-  .option('-r, --root [path]', 'application root directory')
-  .option('-c, --config [path]', 'config file')
-  .option('-s, --supervisord', 'use supervisord mode')
-  .parse(process.argv)
-
-options = hoconfig(program.config or '/etc/ma-agent/ma-agent.conf')  
-
-## init logger
-console.log options.log_file
-if options.log_file == 'console'
-  logger.add(winston.transports.Console, {level: options.log_level, timestamp: true})
-else
-  maxSize = 10 * 1024 * 1024 #10m
-  if options.log_file_size
-    maxSize = util.parseHumaneSize(options.log_file_size)
-
-  maxFiles = 5
-  if options.log_file_count
-    maxFiles = parseInt(options.log_file_count)
-
-  logger.add(winston.transports.File, {
-    filename: options.log_file, 
-    level: options.log_level, 
-    timestamp: true, 
-    maxsize: maxSize
-    maxFiles: maxFiles
-    json: false});
-
-if program.supervisord and not process.env.__supervisor_child
-  supervisord()
-else
+worker = (program, options) ->
   ## this is child run
   root = program.root or '/opt/ma-agent/'
-  run root, options, (err) ->
+  runAgent root, options, (err, agent) ->
     if err
       logger.error err.stack
       process.exit(1) 
@@ -155,4 +113,64 @@ else
       agent.shutdown (err) ->
         logger.error err.stack if err
         process.exit()
-      
+
+    process.on 'uncaughtException', (err) ->
+      logger.error err.stack, () ->
+        agent.shutdown (err) ->
+          logger.error err.stack if err
+          process.exit()
+
+      ## process will exit in 3 seconds
+      setTimeout(() ->
+        process.exit()
+      , 3000 )
+        
+
+supervisord = () ->
+  script = process.argv[1]
+  args = process.argv[2..]
+  sup = supervisor.Supervisor(script, args, 3000)
+  sup.run((err) ->
+    if err
+      console.log "failed to start ma-agent: #{err.message}"   
+      process.exit(1)
+  )
+
+
+main = () ->
+  program
+    .version(version)
+    .option('-r, --root [path]', 'application root directory')
+    .option('-c, --config [path]', 'config file')
+    .option('-s, --supervisord', 'use supervisord mode')
+    .parse(process.argv)
+
+  options = hoconfig(program.config or '/etc/ma-agent/ma-agent.conf')  
+
+  ## init logger
+  if options.log_file == 'console'
+    logger.add(winston.transports.Console, {level: options.log_level, timestamp: true})
+  else
+    maxSize = 10 * 1024 * 1024 #10m
+    if options.log_file_size
+      maxSize = util.parseHumaneSize(options.log_file_size)
+
+    maxFiles = 5
+    if options.log_file_count
+      maxFiles = parseInt(options.log_file_count)
+
+    logger.add(winston.transports.File, {
+      filename: options.log_file, 
+      level: options.log_level, 
+      timestamp: true, 
+      maxsize: maxSize
+      maxFiles: maxFiles
+      handleExceptions: false
+      json: false});
+
+  if program.supervisord and not process.env.__supervisor_child
+    supervisord()
+  else
+    worker(program, options)
+
+main()

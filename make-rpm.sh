@@ -1,6 +1,8 @@
 #!/bin/bash
 VERSION=`cat VERSION`
 
+set -e
+
 ## tarball
 ./make-tarball.sh
 
