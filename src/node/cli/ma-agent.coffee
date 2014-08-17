@@ -145,6 +145,13 @@ main = () ->
     .option('-s, --supervisord', 'use supervisord mode')
     .parse(process.argv)
 
+  options = 
+    remote_host : 'agent.monitors.com'
+    remote_port : 9090
+    buffer_size : 10000
+    buffer_flush : 30
+    agent_report_interval: 30
+
   options = hoconfig(program.config or '/etc/ma-agent/ma-agent.conf')  
 
   ## init logger
