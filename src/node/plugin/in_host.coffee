@@ -15,6 +15,7 @@ module.exports = (config) ->
   return {
     start : (emit, cb) ->
       logger.info "agent report plugin start"
+      report(emit)
       interval_obj = setInterval(report, config.interval * 1000, emit)
       cb()
     

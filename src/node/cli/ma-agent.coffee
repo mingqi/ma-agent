@@ -1,5 +1,6 @@
 program = require 'commander'
 path = require 'path'
+fs = require 'fs'
 us = require 'underscore'
 Agent = require '../agent'
 plugin = require '../plugin'
@@ -14,6 +15,14 @@ util = require '../util'
 winston = require 'winston'
 
 global.logger = new (winston.Logger)({exitOnError: true})
+
+readLicenseKey = (license_key_file) ->
+  if not fs.existsSync(license_key_file)
+    throw new Error("license key #{license_key_file} doesn't exists!")
+
+  content = fs.readFileSync(license_key_file, {encoding: "utf8"})
+  return content.trim()
+  
 
 runAgent = (root, options, callback) -> 
   remote_config = (callback) ->
@@ -139,6 +148,7 @@ main = () ->
     .version(version)
     .option('-r, --root [path]', 'application root directory')
     .option('-c, --config [path]', 'config file')
+    .option('--license_key [path]', 'license key file')
     .option('-s, --supervisord', 'use supervisord mode')
     .parse(process.argv)
 
@@ -150,6 +160,15 @@ main = () ->
     agent_report_interval: 30
 
   us.extend options, hoconfig(program.config or '/etc/ma-agent/ma-agent.conf')
+  license_key_file = program.license_key or '/etc/ma-agent/license_key'
+
+  try
+    license_key = readLicenseKey(license_key_file)
+  catch e
+    console.log "license key can't be read correctly: #{e.message}"
+    process.exit(1)
+  
+  options.license_key = license_key
 
   ## init logger
   if options.log_file == 'console'
