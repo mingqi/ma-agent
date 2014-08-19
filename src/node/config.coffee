@@ -53,7 +53,7 @@ exports.remote = remote = (options, cb) ->
 exports.json = json = (local_path, callback) ->
   fs.readFile(local_path, {encoding: 'utf8'}, (err, data) ->
     if err
-      return callback(err)
+      return callback(new VError(err, "can't read local json config file #{local_path}"))
     try
       config = JSON.parse(data)
     catch e

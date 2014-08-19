@@ -10,8 +10,8 @@ sudo sh <<SCRIPT
   # add treasure data repository to yum
   cat >/etc/yum.repos.d/metricsat.repo <<'EOF';
 [metricsat]
-name = Monitor At, Inc.
-baseurl = http://yum.metricsat.com/repo/$basearch
+name = Metrics At, Inc.
+baseurl = http://yum.metricsat.com/repo/\$basearch
 enabled=1
 gpgcheck=0
 EOF

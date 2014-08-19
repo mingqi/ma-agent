@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash 
 set -e 
 
 VERSION=`cat VERSION`
@@ -7,11 +7,35 @@ ROOT=_build/ma-agent-${VERSION}
 OPT_ROOT=${ROOT}
 NODE_VERSION='0.10.29'
 JRE_VERSION='7u65'
-if [[ -n $1 ]]; then
-	ARCH='x'
-else
-	ARCH=`uname -m`
-fi
+
+ARCH=`uname -m`
+CONF='prod'
+
+while getopts "a:c:" opt; do
+  case $opt in
+    a)
+	  ARCH=$OPTARG
+      ;;
+    c)
+	  CONF=$OPTARG
+      ;;
+    \?)
+      cat <<EOF
+-a <arch> arch is x86_64 or i386
+-c <conf> dev or prod
+
+EOF
+      exit 1
+      ;;
+    :)
+      echo "Option -$OPTARG requires an argument." >&2
+      exit 1
+      ;;
+  esac
+done
+
+echo "ARCH is $ARCH"
+echo "CONF is $CONF"
 
 if [ $ARCH = 'x86_64' ]; then
   NODE_ARCH='x64'
@@ -74,7 +98,7 @@ mkdir ${OPT_ROOT}/var
 # etc
 mkdir -p ${ROOT}/res/etc/ma-agent
 mkdir -p ${ROOT}/res/etc/ma-agent/monitor.d
-cp conf/dev.conf ${ROOT}/res/etc/ma-agent/ma-agent.conf
+cp conf/$CONF.conf ${ROOT}/res/etc/ma-agent/ma-agent.conf
 
 ## init.d
 # mkdir -p ${ROOT}/res/etc/init.d/

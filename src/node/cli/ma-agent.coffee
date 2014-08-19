@@ -81,11 +81,8 @@ runAgent = (root, options, callback) ->
     input_plugins, 
     [
       ['tsd', tsd_upload],
-      ['tsd', stdout()],
       ['host', host_upload]
-      ['host', stdout()],
       ['report', report_upload]
-      ['report', stdout()],
     ]
   )
 
@@ -146,13 +143,13 @@ main = () ->
     .parse(process.argv)
 
   options = 
-    remote_host : 'agent.monitors.com'
+    remote_host : 'api.metricsat.com'
     remote_port : 9090
     buffer_size : 10000
     buffer_flush : 30
     agent_report_interval: 30
 
-  options = hoconfig(program.config or '/etc/ma-agent/ma-agent.conf')  
+  us.extend options, hoconfig(program.config or '/etc/ma-agent/ma-agent.conf')
 
   ## init logger
   if options.log_file == 'console'

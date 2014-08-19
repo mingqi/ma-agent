@@ -44,7 +44,7 @@ linstall: _build/ma-agent.jar lib npm luninstall
 	cp lib/*.jar /opt/ma-agent/lib
 	cp -r _build/npm/lib/ /opt/ma-agent/node_modules/ma-agent/lib
 	cp -r node_modules/ /opt/ma-agent/node_modules/ma-agent/node_modules
-	cp conf/dev.conf /etc/ma-agent/ma-agent.conf
+	# cp conf/dev.conf /etc/ma-agent/ma-agent.conf
 
 luninstall:
 	rm -rf /opt/ma-agent/bin/*

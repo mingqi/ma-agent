@@ -4,7 +4,7 @@ VERSION=`cat VERSION`
 set -e
 
 ## tarball
-./make-tarball.sh
+./make-tarball.sh $@
 
 ## rpmbuild
 mv _build/ma-agent-${VERSION}.tar.gz _build/rpmbuild/SOURCES

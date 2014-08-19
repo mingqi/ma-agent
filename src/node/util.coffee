@@ -8,6 +8,7 @@ fs = require 'fs'
 path = require 'path'
 moment = require 'moment'
 humanFormat = require 'human-format'
+VError = require('verror');
 
 
 exports.systemTime = systemTime = () ->
@@ -115,6 +116,7 @@ exports.emitTSD = (emit, metric, value, timestamp, dimensions) ->
 
 
 exports.rest = (options, body, callback) ->
+  logger.debug "http restful call: #{JSON.stringify options}"
   if not callback
     callback = body
     body = null
@@ -161,7 +163,7 @@ exports.rest = (options, body, callback) ->
   )
 
   request.on('error', (e) ->
-    callback(e)  
+    callback(new VError(e, "http restful cal fialure, reqeust options: #{JSON.stringify options}, error: #{e.message}"))  
   )
 
   if body

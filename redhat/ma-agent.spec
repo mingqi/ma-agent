@@ -7,7 +7,7 @@ Summary: ma-agent
 Name: ma-agent
 Version: 1.0.0
 License: APL2
-Release: 3
+Release: 5
 
 Group: System Environment/Daemons
 Vendor: Monitor@, Inc.
@@ -48,10 +48,10 @@ rm -rf %{buildroot}
 %post
 echo "Configure ma-agent to start, when booting up the OS..."
 /sbin/chkconfig --add ma-agent
-echo "adding 'ma-agent-ro' group..."
-getent group ma-agent-ro >/dev/null || /usr/sbin/groupadd  ma-agent-ro
-echo "adding 'ma-agent-ro' user..."
-getent passwd ma-agent-ro >/dev/null || \
+echo "adding 'ma-agent' group..."
+getent group ma-agent >/dev/null || /usr/sbin/groupadd  ma-agent
+echo "adding 'ma-agent' user..."
+getent passwd ma-agent >/dev/null || \
   /usr/sbin/useradd -g ma-agent -s /bin/bash -c 'ma-agent' ma-agent
 
 %preun
@@ -61,6 +61,7 @@ echo "Stopping ma-agent ..."
 
 %files
 %defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/ma-agent/ma-agent.conf
 /etc/ma-agent/*
 /etc/init.d/ma-agent
 /opt/ma-agent/*

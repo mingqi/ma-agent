@@ -6,7 +6,6 @@ util = require '../util'
 module.exports = (config) ->
   interval_obj = null
   count = 0
-  metric = config.metric
   report = (emit) ->
     emit({
       tag: 'host',
