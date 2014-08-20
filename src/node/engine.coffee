@@ -5,9 +5,6 @@ us = require 'underscore'
 util = require 'util'
 empty_cb = `function (err){}`
 
-global.logger = logger = winston = require 'winston'
-
-
 Engine = () ->
   inputs = []
   outputs = []

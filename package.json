@@ -12,7 +12,7 @@
     "underscore": "*",
     "utile": "*",
     "verror": "*",
-    "winston": "*",
+    "log4js": "*",
     "xregexp": "*",
     "MD5" : "*",
     "dirty" : "*",

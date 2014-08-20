@@ -12,9 +12,13 @@ host = require '../plugin/in_host'
 supervisor = require '../supervisor'
 version = require '../version'
 util = require '../util'
-winston = require 'winston'
+log4js = require 'log4js'
 
-global.logger = new (winston.Logger)({exitOnError: true})
+log4js.loadAppender('file');
+log4js.loadAppender('console');
+
+log4js.clearAppenders()
+global.logger = log4js.getLogger('ma-agent')
 
 readLicenseKey = (license_key_file) ->
   if not fs.existsSync(license_key_file)
@@ -171,8 +175,9 @@ main = () ->
   options.license_key = license_key
 
   ## init logger
+  logger.setLevel(options.log_level || 'info')
   if options.log_file == 'console'
-    logger.add(winston.transports.Console, {level: options.log_level, timestamp: true})
+    log4js.addAppender(log4js.appenders.console() );
   else
     maxSize = 10 * 1024 * 1024 #10m
     if options.log_file_size
@@ -182,14 +187,8 @@ main = () ->
     if options.log_file_count
       maxFiles = parseInt(options.log_file_count)
 
-    logger.add(winston.transports.File, {
-      filename: options.log_file, 
-      level: options.log_level, 
-      timestamp: true, 
-      maxsize: maxSize
-      maxFiles: maxFiles
-      handleExceptions: false
-      json: false});
+    log4js.addAppender(log4js.appenders.file(options.log_file, null, maxSize, maxFiles));
+
 
   if program.supervisord and not process.env.__supervisor_child
     supervisord()
