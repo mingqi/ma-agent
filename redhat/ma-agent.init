@@ -39,6 +39,9 @@ start() {
 	daemon --pidfile=$PIDFILE $ma_agent "$MA_AGENT_ARGS"
 	RETVAL=$?
 	echo
+	if [[ ! "$RETVAL" -eq 0 ]]; then
+		echo "please see more detail information in /var/log/ma-agent.log"
+	fi
 	return $RETVAL
 }
 
@@ -48,6 +51,9 @@ stop() {
 	RETVAL=$?
 	 [ "$RETVAL" -eq 0 ] && success $"startup" || failure $"startup"
 	 echo
+	if [[ ! "$RETVAL" -eq 0 ]]; then
+		echo "please see more detail information in /var/log/ma-agent.log"
+	fi
 	return $RETVAL
 }
 

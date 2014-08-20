@@ -18,18 +18,27 @@
 prog="ma-agent"
 ma_agent=/opt/ma-agent/bin/ma-agent
 
+RETVAL=0
 start() {
 	# Set Max number of file descriptors for the safety sake
 	# see http://docs.fluentd.org/en/articles/before-install
 	echo -n "Starting $prog: "
 	$ma_agent start -s
-	log_end_msg $?
+	RETVAL=$?
+	if [[ ! "$RETVAL" -eq 0 ]]; then
+		echo "please see more detail information in /var/log/ma-agent.log"
+	fi	
+	log_end_msg $RETVAL
 }
 
 stop() {
 	echo -n "Shutting down $prog: "
 	$ma_agent stop
-	log_end_msg $?
+	RETVAL=$?
+	if [[ ! "$RETVAL" -eq 0 ]]; then
+		echo "please see more detail information in /var/log/ma-agent.log"
+	fi	
+	log_end_msg $RETVAL
 }
 
 restart() {
