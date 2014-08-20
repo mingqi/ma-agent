@@ -1,30 +1,16 @@
-humanFormat = require 'human-format'
-a = humanFormat(2024, {
-    prefixes: humanFormat.makePrefixes(
-        ',m,g'.split(','),
-        1024
-    )
-});
+util = require '../src/node/util'
+global.logger = winston = require 'winston'
 
-# console.log a
+options =
+  ssl: false
+  host: 'api.metricsat.com'
+  # port: 443
+  method: 'GET'
+  path: '/monitor/app-01.tushucheng.com'
+  headers:
+    'licenseKey': 'tMe43aiHpttg3vLT0zvk'
 
-
-prefixes = humanFormat.makePrefixes(
-        ',k,m,g'.split(','),
-        1024 )
-
-
-# console.log humanFormat.parse('3m', {
-#     prefixes: humanFormat.makePrefixes(
-#         ',m,g'.split(','),
-#         1024
-#     )
-# })
-
-opts = {
-  unit: 'B'
-  prefixes: humanFormat.makePrefixes(',K,M,G,T'.split(','), 1024 )
-}
-
-console.log  humanFormat.parse('10', opts)
-console.log humanFormat(10485760, opts)
+util.rest options, (err, status, result) ->
+  return console.log err if err
+  console.log status
+  console.log result

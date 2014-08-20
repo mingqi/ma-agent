@@ -33,6 +33,7 @@ exports.local = local = (local_path, cb) ->
 exports.remote = remote = (options, cb) ->
   util.rest(
     {
+      ssl: true
       host: options.host 
       port: options.port
       method: 'GET'

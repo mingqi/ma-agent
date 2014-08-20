@@ -1,4 +1,5 @@
 http = require 'http'
+https = require 'https'
 zlib = require 'zlib'
 us = require 'underscore'
 async = require 'async'  
@@ -132,7 +133,8 @@ exports.rest = (options, body, callback) ->
       body = JSON.stringify(body)
 
   buffs = []
-  request = http.request(options, (response) ->
+  http_module = if options.ssl then https else http
+  request = http_module.request(options, (response) ->
     response.on('data', (chunk) ->
       buffs.push chunk    
     )

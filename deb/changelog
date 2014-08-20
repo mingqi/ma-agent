@@ -1,3 +1,9 @@
+ma-agent (1.0.1-1) precise; urgency=low
+
+  * add ssl transport supported
+
+ --  <shaomq@monitorat.com> Wen, 20 Aug 2014
+
 ma-agent (1.0.0-1) precise; urgency=low
 
   * Initial release. 

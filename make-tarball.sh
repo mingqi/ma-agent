@@ -10,8 +10,9 @@ JRE_VERSION='7u65'
 
 ARCH=`uname -m`
 CONF='prod'
+LONG_NAME=0
 
-while getopts "a:c:" opt; do
+while getopts "a:c:n" opt; do
   case $opt in
     a)
 	  ARCH=$OPTARG
@@ -19,10 +20,14 @@ while getopts "a:c:" opt; do
     c)
 	  CONF=$OPTARG
       ;;
+    n)
+    LONG_NAME=1
+      ;;
     \?)
       cat <<EOF
 -a <arch> arch is x86_64 or i386
 -c <conf> dev or prod
+-n add os and arch in name
 
 EOF
       exit 1
@@ -40,13 +45,20 @@ echo "CONF is $CONF"
 if [ $ARCH = 'x86_64' ]; then
   NODE_ARCH='x64'
   JRE_ARCH='x64'
+  ARCH_NAME='x86_64'
 else
   NODE_ARCH='x86'
   JRE_ARCH='i586'
+  ARCH_NAME='i386'
 fi
 
 NODE=node-v${NODE_VERSION}-linux-${NODE_ARCH}
 JRE=jre-${JRE_VERSION}-linux-${JRE_ARCH}
+TARBALL_NAME=ma-agent-${VERSION}
+if [[ ! "$LONG_NAME" -eq 0 ]]; then
+  TARBALL_NAME="${TARBALL_NAME}-linux-${ARCH_NAME}"
+fi
+TARBALL_NAME=${TARBALL_NAME}.tar.gz
 
 rm -rf _build
 
@@ -105,5 +117,5 @@ cp conf/$CONF.conf ${ROOT}/res/etc/ma-agent/ma-agent.conf
 # cp init.d/ma-agent ${ROOT}/res/etc/init.d
 
 ## tarball
-pushd _build && tar -zcf ma-agent-${VERSION}.tar.gz ma-agent-${VERSION}
+pushd _build && tar -zcf ${TARBALL_NAME} ma-agent-${VERSION}
 popd

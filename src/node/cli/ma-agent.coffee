@@ -154,7 +154,7 @@ main = () ->
 
   options = 
     remote_host : 'api.metricsat.com'
-    remote_port : 9090
+    remote_port : 443
     buffer_size : 10000
     buffer_flush : 30
     agent_report_interval: 30

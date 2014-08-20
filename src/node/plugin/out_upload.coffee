@@ -34,6 +34,7 @@ Upload = (config) ->
         body.push(record)
 
       util.rest({
+        ssl: true
         host: remote_host
         port: remote_port
         method: 'POST'
