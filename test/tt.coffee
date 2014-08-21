@@ -1,16 +1,14 @@
-util = require '../src/node/util'
-global.logger = winston = require 'winston'
+async = require 'async'
 
-options =
-  ssl: false
-  host: 'api.metricsat.com'
-  # port: 443
-  method: 'GET'
-  path: '/monitor/app-01.tushucheng.com'
-  headers:
-    'licenseKey': 'tMe43aiHpttg3vLT0zvk'
+async.series [
+  (callback) ->
+    console.log "this is one"
+    callback()
 
-util.rest options, (err, status, result) ->
-  return console.log err if err
-  console.log status
-  console.log result
+  (callback) ->
+    console.log "this is two"
+    callback()
+  ]
+, (err) ->
+    console.log err
+  

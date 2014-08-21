@@ -8,18 +8,18 @@ path = require 'path'
 glob = require 'glob'
 fs = require 'fs'
 md5 = require 'MD5'
-
-
+async = require 'async'
+VError = require('verror');
 
 _hashConfig = (config) ->
+
   pair_list = for k in us.keys(config).sort()
     k + ':' + config[k] 
   md5(JSON.stringify(pair_list.join(',')))
 
 module.exports = Agent = (configer, inputs, outputs) -> 
 
-  input_config_index = {}
-  input_index = {}
+  running_inputs = {}
   engine = Engine()
 
   for input in inputs
@@ -28,52 +28,72 @@ module.exports = Agent = (configer, inputs, outputs) ->
   for [match, output] in outputs
     engine.addOutput(match, output)
 
-  flushInput = () ->
-    configer( (err, config) ->
+  refreshInput = () ->
+    configer (err, config) ->
       if err
         logger.error err.stack
         return
-      target = {}
+
+      fresh_inputs = {}
       for in_conf in config
-        target[_hashConfig(in_conf)] = in_conf
+        fresh_inputs[_hashConfig(in_conf)] = in_conf
 
-      to_add = us.difference(us.keys(target), us.keys(input_config_index))
-      to_remove = us.difference(us.keys(input_config_index), us.keys(target))
+      to_add = us.difference(us.keys(fresh_inputs), us.keys(running_inputs))
+      to_remove = us.difference(us.keys(running_inputs), us.keys(fresh_inputs))
 
-      for remove_index in to_remove
-        input = input_index[remove_index]
-        engine.removeInput(input)
-        delete input_index[remove_index]
-        delete input_config_index[remove_index]
-
-      for add_index in to_add
-        in_conf = target[add_index]
-        type = in_conf.type
-        in_plugin = plugin.plugin(type)
-        if not in_plugin
-          logger.error "type #{type} is not supported"
-          continue
-        try
-          input = in_plugin(in_conf)
-        catch e
-          logger.error e.stack
-          continue
+      async.series [
+        (callback) ->
+          # it's will be serious problem if failed to shutdown
+          # a plugin. That will result in duplicate plugin running.
+          # So throw a exception to force process to restart 
+          async.each to_remove
+          , (input_hash, callback) ->
+              engine.removeInput running_inputs[input_hash], (err) ->
+                delete running_inputs[input_hash] if not err
+                err = new VError(err, "failed to shutdown running input plugin") if err
+                callback(err)
+          , (err) ->
+              throw err if err
+              callback() 
         
-        engine.addInput(input, (err) ->
-          if not err
-            input_index[add_index] = input
-            input_config_index[add_index] = in_conf
-        )
-    )
+        (callback) ->
+          # the start plugin is difference with shutdown. any failure should NOT 
+          # impact other plugin. So we ignore all error related to individual plugin
+          async.each to_add
+          , (input_hash, callback) ->
+              in_conf = fresh_inputs[input_hash]
+              type = in_conf.type
+              in_plugin = plugin.plugin(type)
+              if not in_plugin
+                ## ignore this error to prevent from impact other plugins
+                logger.error "type #{type} is not supported"
+                return callback()
+              try
+                input = in_plugin(in_conf)
+              catch e
+                ## ignore this error to prevent from impact other plugins
+                logger.error e.stack
+                return callback()
+              
+              engine.addInput input, (err) ->
+                if err
+                  logger.error err if err
+                else
+                  running_inputs[input_hash] = input
 
+                callback()
+        ]
+      , (err) ->
+          logger.error err if err
+                  
 
   return {
     start : (callback) ->
       engine.start((err) ->
         return callback(err) if err
-        flushInput()
+        refreshInput()
         logger.info "engine started"
-        setInterval(flushInput, 2000)
+        setInterval(refreshInput, 2000)
         callback()
       )
     

@@ -4,6 +4,8 @@ hoconfig = require 'hoconfig-js'
 stdout = require '../plugin/out_stdout'
 upload = require '../plugin/out_upload'
 us = require 'underscore'
+log4js = require 'log4js'
+global.logger = log4js.getLogger()
 
 args = process.argv[2..]
 if args.length !=2
@@ -33,4 +35,7 @@ agent = Agent(
   ['tsd', out_upload]], 
   options)
 
-agent.start()
+agent.start (err) ->
+  console.log err
+
+

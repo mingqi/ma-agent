@@ -1,11 +1,11 @@
 %define        __spec_install_post %{nil}
 %define          debug_package %{nil}
 %define        __os_install_post %{_dbpath}/brp-compress
-%define 	   _topdir %(echo $PWD)/
+%define      _topdir %(echo $PWD)/
 
 Summary: ma-agent
 Name: ma-agent
-Version: 1.0.1
+Version: 1.0.2
 License: APL2
 Release: 1
 
@@ -53,11 +53,18 @@ getent group ma-agent >/dev/null || /usr/sbin/groupadd  ma-agent
 echo "adding 'ma-agent' user..."
 getent passwd ma-agent >/dev/null || \
   /usr/sbin/useradd -g ma-agent -s /bin/bash -c 'ma-agent' ma-agent
+if [ -f "/etc/ma-agent/license_key" ]; then
+  echo "to restart ma-agent ..."
+  /etc/init.d/ma-agent restart
+fi
 
 %preun
-echo "Stopping ma-agent ..."
-/sbin/service ma-agent stop >/dev/null 2>&1 || :
-/sbin/chkconfig --del ma-agent
+if [ $1 -eq 0 ] ; then
+  ## uninstall
+  echo "Stopping ma-agent ..."
+  /sbin/service ma-agent stop >/dev/null 2>&1 || :
+  /sbin/chkconfig --del ma-agent
+fi
 
 %files
 %defattr(-,root,root,-)

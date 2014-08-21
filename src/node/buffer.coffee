@@ -46,8 +46,10 @@ module.exports = (config, output) ->
   assert.ok(buffer_size, "option buffer_size is required for buffered output plugin")  
   assert.ok(buffer_flush, "option buffer_flush is required for buffered output plugin")  
 
-  retry_times = parseInt(config.retry_times) || 1
-  retry_interval = parseInt(config.retry_interval) || 1 
+  retry_times = parseInt(config.retry_times)  || 1
+  retry_interval = parseInt(config.retry_interval) || 100
+
+  console.log "retry_times= #{retry_times}"
 
   buffer = []
   collectBuffer = () ->

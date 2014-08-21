@@ -15,7 +15,7 @@ Upload = (config) ->
     name : 'upload'
     
     start : (cb) ->
-      cb()    
+      cb()
 
     shutdown : (cb) ->
       cb()

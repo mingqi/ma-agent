@@ -14,11 +14,19 @@ add_system_user() {
 	fi
 }
 
+startup_program(){
+    if [ -f "/etc/ma-agent/license_key" ]; then
+      echo "restart ma-agent ..."
+      /etc/init.d/ma-agent restart
+    fi
+}
+
 
 case "$1" in
     configure)
         add-init
         add_system_user
+        startup_program
         ;;
     abort-upgrade|abort-deconfigure|abort-remove)
         :

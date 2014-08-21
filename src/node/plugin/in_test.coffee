@@ -8,7 +8,8 @@ module.exports = (config) ->
 
   query = (emit) ->
     if count >  5
-      throw new Error("this is exception")
+      console.log "" 
+      # throw new Error("this is exception")
     emit({
       tag: config.tag
       record: { metric: monitor, value: count+=1 }
@@ -20,10 +21,14 @@ module.exports = (config) ->
       console.log "intest start..."
       plugin_report = report.PluginReport(emit, config.monitor)
       interval_obj = setInterval(query, config.interval * 1000, emit)
-      cb()
+      if config.interval > 5
+        cb(new Error("not support interval more than 5")) 
+      else
+        cb()
     
     shutdown : (cb) ->
       console.log "intest shutdonw... #{interval_obj}"
       clearInterval(interval_obj) if interval_obj
       cb()
+      # cb(new Error("failed to shutdown test plugin"))
   }
