@@ -49,7 +49,7 @@ Upload = (config) ->
             callback(new VError(err, "failure on send data to #{remote_host}:#{remote_port}")) 
           else
             if status != 200
-              callback(new Error("upload service return error response, status=#{status}"))  
+              callback(new Error("upload service return error response, status=#{status}"))
             else
               callback()
         )

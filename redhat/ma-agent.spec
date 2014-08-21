@@ -10,8 +10,8 @@ License: APL2
 Release: 1
 
 Group: System Environment/Daemons
-Vendor: Monitor@, Inc.
-URL: http://monitorat.com/
+Vendor: Metrics At, Inc.
+URL: http://metricsat.com/
 SOURCE0: %{name}-%{version}.tar.gz
 Source1: %{name}.init
 BuildRoot: /var/tmp/ma-agent/rpmbuild/BUILDROOT

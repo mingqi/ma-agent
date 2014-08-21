@@ -28,14 +28,17 @@ retry = (times, wait_sec, task, cb) ->
     (cb) ->
       task((err) ->
         did += 1
+        logger.debug "#{did} times to do task"
         if not err
           cb()
         else
+          timeout_secs = wait_sec * (2 ** (did - 1) )
+          logger.debug "failed to do task, next will wait #{timeout_secs} seconds"
           setTimeout(
             () ->
               cb(err) 
             , 
-            1000 * wait_sec * (2 ** (did - 1) )
+            1000 * timeout_secs
             ))
     ,
     cb)
@@ -46,8 +49,8 @@ module.exports = (config, output) ->
   assert.ok(buffer_size, "option buffer_size is required for buffered output plugin")  
   assert.ok(buffer_flush, "option buffer_flush is required for buffered output plugin")  
 
-  retry_times = parseInt(config.retry_times)  || 1
-  retry_interval = parseInt(config.retry_interval) || 100
+  retry_times = parseInt(config.retry_times) || 5
+  retry_interval = parseInt(config.retry_interval) || 10
 
   console.log "retry_times= #{retry_times}"
 
